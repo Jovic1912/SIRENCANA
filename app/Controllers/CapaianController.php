@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Models\KelasModel;
+use App\Models\MataKuliahModel;
+use App\Models\PesertaKelasModel;
+use App\Models\MahasiswaModel;
+use App\Models\PresensiModel;
+use App\Models\NilaiModel;
+use App\Models\JenisPenilaianModel;
+use App\Models\MatriksPenilaianModel;
+use App\Models\CpmkModel;
+
+class CapaianController extends BaseController
+{
+    public function index()
+    {
+        $data = [
+            'title'    => 'Capaian CPMK — Laporan OBE',
+            'kelasAll' => (new KelasModel())->orderBy('id', 'DESC')->findAll(),
+            'mkById'   => array_column((new MataKuliahModel())->findAll(), null, 'id'),
+        ];
+        return view('capaian/pilih', $data);
+    }
+
+    /**
+     * Menghitung capaian CPMK & rekap presensi untuk seluruh peserta satu kelas.
+     * Dipakai bersama oleh CapaianController & PortofolioController.
+     */
+    public static function hitung(array $kelas): array
+    {
+        $mk = (new MataKuliahModel())->find($kelas['mk_id']);
+        $peserta = (new PesertaKelasModel())->where('kelas_id', $kelas['id'])->findAll();
+        $mhsById = array_column((new MahasiswaModel())->findAll(), null, 'id');
+        $cpmkList = (new CpmkModel())->where('mk_id', $kelas['mk_id'])->findAll();
+        $jenisList = (new JenisPenilaianModel())->where('rps_id', $kelas['rps_id'])->findAll();
+        $matriksRows = (new MatriksPenilaianModel())->where('rps_id', $kelas['rps_id'])->findAll();
+
+        $presensiModel = new PresensiModel();
+        $nilaiModel = new NilaiModel();
+
+        $rows = [];
+        foreach ($peserta as $p) {
+            $presensiRows = $presensiModel->where('peserta_id', $p['id'])->findAll();
+            $nilaiRows = $nilaiModel->where('peserta_id', $p['id'])->findAll();
+            $nilaiByJenis = [];
+            foreach ($nilaiRows as $n) { $nilaiByJenis[$n['jenis_penilaian_id']] = $n['nilai']; }
+
+            $rows[] = [
+                'peserta' => $p,
+                'mhs'     => $mhsById[$p['mahasiswa_id']] ?? null,
+                'pres'    => rekap_presensi($presensiRows, (int) ($kelas['jumlah_pertemuan'] ?? 16)),
+                'akhir'   => nilai_akhir($nilaiByJenis, $jenisList),
+                'capaian' => capaian_cpmk($nilaiByJenis, $cpmkList, $matriksRows),
+            ];
+        }
+
+        $summary = [];
+        foreach ($cpmkList as $cp) {
+            $vals = [];
+            foreach ($rows as $r) {
+                foreach ($r['capaian'] as $c) {
+                    if ($c['cpmk']['id'] === $cp['id'] && $c['nilai'] !== null) $vals[] = $c;
+                }
+            }
+            $count = fn ($skala) => count(array_filter($vals, fn ($v) => $v['skala'] === $skala));
+            $lulus = count(array_filter($vals, fn ($v) => $v['lulus']));
+            $summary[] = [
+                'cpmk'       => $cp,
+                'total'      => count($vals),
+                'sb'         => $count('Sangat Baik'),
+                'b'          => $count('Baik'),
+                'c'          => $count('Cukup'),
+                'k'          => $count('Kurang'),
+                'persenLulus'=> count($vals) ? round($lulus / count($vals) * 1000) / 10 : 0,
+            ];
+        }
+
+        return ['mk' => $mk, 'cpmkList' => $cpmkList, 'rows' => $rows, 'summary' => $summary];
+    }
+
+    public function show(int $id)
+    {
+        $kelas = (new KelasModel())->find($id);
+        if (! $kelas) return redirect()->to(site_url('capaian'))->with('error', 'Kelas tidak ditemukan.');
+
+        $hasil = self::hitung($kelas);
+        $data = array_merge($hasil, [
+            'title' => 'Capaian CPMK — ' . ($hasil['mk']['nama'] ?? ''),
+            'kelas' => $kelas,
+        ]);
+        return view('capaian/show', $data);
+    }
+}

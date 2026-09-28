@@ -1,0 +1,26 @@
+#--------------------------------------------------------------------
+# SIRENCANA — Konfigurasi Lingkungan (CodeIgniter 4)
+# Salin/ubah nama file ini menjadi ".env" lalu sesuaikan nilainya.
+#--------------------------------------------------------------------
+
+CI_ENVIRONMENT = development
+
+app.baseURL = 'http://localhost:8080/'
+
+#--------------------------------------------------------------------
+# DATABASE — default memakai SQLite (tanpa perlu instal server database,
+# tinggal jalankan). Untuk memakai MySQL/MariaDB (mis. XAMPP/Laragon),
+# hapus tanda pagar pada blok MySQL di bawah dan beri pagar pada blok SQLite.
+#--------------------------------------------------------------------
+database.default.DBDriver = SQLite3
+database.default.database = sirencana.db
+database.default.DBDebug = true
+
+# --- Alternatif MySQL/MariaDB (mis. XAMPP/Laragon) ---
+# database.default.DBDriver = MySQLi
+# database.default.hostname = localhost
+# database.default.database = db_sirencana
+# database.default.username = root
+# database.default.password =
+# database.default.DBPrefix =
+# database.default.port = 3306
