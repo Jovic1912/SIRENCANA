@@ -96,3 +96,51 @@ ubah `app.baseURL` di file `.env` agar sesuai alamat tersebut, contoh:
     app.baseURL = 'http://localhost/SIRENCANA/public/'
 
 Bila memakai `php spark serve`, biarkan `http://localhost:8080/`.
+
+
+## Login & Peran Pengguna
+
+Sistem ini memakai autentikasi berbasis username/password dengan lima peran:
+**Administrator, Dosen, GKM, Kaprodi, GPM.** Setiap peran punya menu dan
+kewenangan berbeda mengikuti alur persetujuan RPS (lihat halaman Pengguna
+di dalam aplikasi untuk penjelasan lengkap tiap peran).
+
+### Membuat akun administrator pertama kali
+
+Setelah migrasi (`php spark migrate --all`), jalankan:
+```
+php spark db:seed UserSeeder
+```
+Perintah ini menampilkan **username `admin` dan password acak satu kali** di
+terminal. Catat password itu — Anda akan diminta menggantinya saat login
+pertama. Setelah login, buat akun Dosen/GKM/Kaprodi/GPM lainnya lewat menu
+**Pengguna** (khusus Administrator), masing-masing dengan password awal yang
+wajib diganti sendiri oleh pemiliknya saat pertama login.
+
+Akun **Dosen** dan **Kaprodi** harus ditautkan ke data Dosen (menu Data Induk
+→ Dosen) agar sistem tahu RPS dan kelas mana yang menjadi tanggung jawab
+mereka.
+
+### Akun demo (opsional, hanya untuk uji coba lokal)
+
+```
+php spark db:seed UserDemoSeeder
+```
+Membuat 4 akun contoh (`dosen1`, `kaprodi1`, `gkm1`, `gpm1`, semua dengan
+password `demo12345`) untuk mencoba alur kerja lintas-peran dengan cepat.
+**Jangan pernah menjalankan seeder ini di server yang dipakai sungguhan** —
+hapus akun-akun ini atau ganti passwordnya sebelum dipakai bersama.
+
+### Ringkasan kewenangan
+
+| Peran | Dapat melakukan |
+|---|---|
+| Administrator | Kelola Data Induk, Pengguna, Kurikulum; tidak dapat menyetujui/menandatangani RPS |
+| Dosen | Menyusun & mengajukan RPS miliknya; mengelola kelas, presensi, nilai, portofolio yang diampunya |
+| GKM | Menyetujui atau meminta revisi RPS yang diajukan |
+| Kaprodi | Menandatangani RPS, mengelola CPL/CPMK & mata kuliah, membuka kelas, mengarsipkan RPS |
+| GPM | Mengarsipkan RPS yang sudah ditandatangani, memantau capaian & portofolio |
+
+Proteksi CSRF kini aktif untuk seluruh form. Jalankan
+`php spark migrate --all` setelah menarik pembaruan ini agar tabel `users`
+ikut terbuat.
