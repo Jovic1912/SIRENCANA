@@ -72,3 +72,7 @@ textarea{min-height:70px; resize:vertical;}
 .alert.success{background:var(--green-soft); color:var(--green);}
 .alert.error{background:var(--red-soft); color:var(--red);}
 .muted{color:var(--ink-soft);}
+
+.iconbtn{font-family:inherit;padding:0;}
+button.link{background:none;border:none;cursor:pointer;font-family:inherit;padding:0;}
+nav a.active{background:rgba(255,255,255,.12);}

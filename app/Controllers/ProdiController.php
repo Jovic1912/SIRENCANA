@@ -12,6 +12,7 @@ class ProdiController extends BaseController
         $data = [
             'title' => 'Program Studi',
             'prodi' => $model->orderBy('nama', 'ASC')->findAll(),
+            'canWrite' => has_role('admin'),
         ];
         return view('master/prodi', $data);
     }

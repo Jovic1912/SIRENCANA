@@ -4,8 +4,10 @@
 <div class="pagehead"><div><h1>Program Studi</h1><p>Data induk fakultas, jurusan, dan program studi.</p></div></div>
 
 <div class="panel">
-  <h2>Tambah Program Studi</h2>
+  <?php if ($canWrite): ?>
+<h2>Tambah Program Studi</h2>
   <form method="post" action="<?= site_url('prodi/store') ?>">
+<?= csrf_field() ?>
     <div class="field-row">
       <div class="field"><label>Nama Program Studi</label><input type="text" name="nama" placeholder="mis. Informatika" required></div>
       <div class="field"><label>Jurusan</label><input type="text" name="jurusan" placeholder="mis. Teknik Informatika"></div>
@@ -13,6 +15,7 @@
     </div>
     <button type="submit" class="btn">Tambah Program Studi</button>
   </form>
+<?php endif; ?>
 </div>
 
 <div class="panel">
@@ -28,7 +31,7 @@
           <td><strong><?= esc($p['nama']) ?></strong></td>
           <td><?= esc($p['jurusan']) ?></td>
           <td><?= esc($p['fakultas']) ?></td>
-          <td><a class="iconbtn" href="<?= site_url('prodi/delete/' . $p['id']) ?>" onclick="return confirm('Hapus program studi ini?')">Hapus</a></td>
+          <td><?php if ($canWrite): ?><?= delete_form(site_url('prodi/delete/' . $p['id']), 'Hapus', 'Hapus program studi ini?') ?><?php endif; ?></td>
         </tr>
       <?php endforeach; ?>
       </tbody>

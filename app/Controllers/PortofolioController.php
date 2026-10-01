@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\Access;
 use App\Models\KelasModel;
 use App\Models\MataKuliahModel;
 use App\Models\RpsModel;
@@ -18,7 +19,7 @@ class PortofolioController extends BaseController
     {
         $data = [
             'title'    => 'Portofolio Mata Kuliah',
-            'kelasAll' => (new KelasModel())->orderBy('id', 'DESC')->findAll(),
+            'kelasAll' => Access::visibleKelas(),
             'mkById'   => array_column((new MataKuliahModel())->findAll(), null, 'id'),
         ];
         return view('portofolio/pilih', $data);
@@ -28,6 +29,7 @@ class PortofolioController extends BaseController
     {
         $kelas = (new KelasModel())->find($id);
         if (! $kelas) return redirect()->to(site_url('portofolio'))->with('error', 'Kelas tidak ditemukan.');
+        if (! Access::canViewKelas($id)) return redirect()->to(site_url('portofolio'))->with('error', 'Anda bukan pengampu kelas tersebut.');
 
         $mk = (new MataKuliahModel())->find($kelas['mk_id']);
         $rps = (new RpsModel())->find($kelas['rps_id']);
@@ -65,12 +67,14 @@ class PortofolioController extends BaseController
             'rows'         => $hasil['rows'],
             'cpmkList'     => $hasil['cpmkList'],
             'summary'      => $hasil['summary'],
+            'canWrite'     => Access::canWriteKelasData($id),
         ];
         return view('portofolio/show', $data);
     }
 
     public function updateNarasi(int $id)
     {
+        if (! Access::canWriteKelasData($id)) return redirect()->to(site_url('portofolio'))->with('error', 'Hanya dosen pengampu yang dapat mengubah narasi portofolio.');
         $model = new PortofolioModel();
         $existing = $model->where('kelas_id', $id)->first();
         $payload = [

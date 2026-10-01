@@ -46,6 +46,7 @@ class KurikulumController extends BaseController
             'cplList'         => $cplList,
             'bobotCplByCpmk'  => $bobotCplByCpmk,
             'cpmkCountByMk'   => $this->cpmkCountFor($mkList, $cpmkModel),
+            'canWrite'        => has_role('admin', 'kaprodi'),
         ];
         return view('kurikulum/index', $data);
     }

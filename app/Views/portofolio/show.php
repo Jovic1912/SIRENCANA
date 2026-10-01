@@ -30,12 +30,16 @@
 
     <div class="panel">
       <h2>Narasi Pelaksanaan</h2>
+      <?php if (! $canWrite): ?><p class="hint">Anda hanya dapat melihat narasi ini.</p><?php endif; ?>
+      <?php if ($canWrite): ?>
       <form method="post" action="<?= site_url('portofolio/' . $kelas['id'] . '/narasi') ?>">
+<?= csrf_field() ?>
         <div class="field"><label>Tujuan Perkuliahan</label><textarea name="tujuan"><?= esc($portofolio['tujuan'] ?? '') ?></textarea></div>
         <div class="field"><label>Metode Pelaksanaan</label><textarea name="metode"><?= esc($portofolio['metode'] ?? '') ?></textarea></div>
         <div class="field"><label>Ringkasan Isi Perkuliahan</label><textarea name="isi"><?= esc($portofolio['isi'] ?? '') ?></textarea></div>
         <button type="submit" class="btn sm">Simpan Narasi</button>
       </form>
+      <?php endif; ?>
     </div>
   </div>
 

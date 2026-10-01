@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\Access;
 use App\Models\KelasModel;
 use App\Models\KelasDosenModel;
 use App\Models\KontrakKuliahModel;
@@ -19,7 +20,7 @@ class KelasController extends BaseController
     public function index()
     {
         $kelasModel = new KelasModel();
-        $kelasAll = $kelasModel->orderBy('id', 'DESC')->findAll();
+        $kelasAll = Access::visibleKelas();
         $mkById = array_column((new MataKuliahModel())->findAll(), null, 'id');
 
         $rpsSiap = (new RpsModel())->where('status', 'diarsipkan')->findAll();
@@ -41,6 +42,7 @@ class KelasController extends BaseController
             'dosenList'      => (new DosenModel())->orderBy('nama', 'ASC')->findAll(),
             'pesertaCount'   => $pesertaCount,
             'kontrakByKelas' => $kontrakByKelas,
+            'canCreate'      => has_role('admin', 'kaprodi'),
         ];
         return view('kelas/index', $data);
     }
@@ -87,6 +89,7 @@ class KelasController extends BaseController
         $kelasModel = new KelasModel();
         $kelas = $kelasModel->find($id);
         if (! $kelas) return redirect()->to(site_url('kelas'))->with('error', 'Kelas tidak ditemukan.');
+        if (! Access::canViewKelas($id)) return redirect()->to(site_url('kelas'))->with('error', 'Anda bukan pengampu kelas tersebut.');
 
         $mk = (new MataKuliahModel())->find($kelas['mk_id']);
         $dosenIds = array_column((new KelasDosenModel())->where('kelas_id', $id)->findAll(), 'dosen_id');
@@ -116,6 +119,7 @@ class KelasController extends BaseController
             'peserta'     => $peserta,
             'mhsById'     => $mhsById,
             'eligibleMhs' => array_values($eligibleMhs),
+            'canManage'   => Access::canManageKelas($id),
         ];
         return view('kelas/detail', $data);
     }
@@ -124,6 +128,7 @@ class KelasController extends BaseController
     {
         $kelas = (new KelasModel())->find($id);
         if (! $kelas) return redirect()->to(site_url('kelas'));
+        if (! Access::canManageKelas($id)) return redirect()->to(site_url('kelas'))->with('error', 'Anda tidak berwenang mengubah kelas ini.');
         $kontrak = (new KontrakKuliahModel())->where('kelas_id', $id)->first();
         $payload = [
             'jadwal_ruang' => $this->request->getPost('jadwal_ruang'),
@@ -148,6 +153,7 @@ class KelasController extends BaseController
 
     public function addPeserta(int $id)
     {
+        if (! Access::canManageKelas($id)) return redirect()->to(site_url('kelas'))->with('error', 'Anda tidak berwenang mengubah kelas ini.');
         $mhsId = (int) $this->request->getPost('mahasiswa_id');
         if ($mhsId) {
             $exists = (new PesertaKelasModel())->where(['kelas_id' => $id, 'mahasiswa_id' => $mhsId])->first();
@@ -160,7 +166,8 @@ class KelasController extends BaseController
 
     public function deletePeserta(int $id, int $pesertaId)
     {
-        (new PesertaKelasModel())->delete($pesertaId);
+        if (! Access::canManageKelas($id)) return redirect()->to(site_url('kelas'))->with('error', 'Anda tidak berwenang mengubah kelas ini.');
+        (new PesertaKelasModel())->where('kelas_id', $id)->delete($pesertaId);
         return redirect()->to(site_url('kelas/' . $id))->with('success', 'Peserta dikeluarkan.');
     }
 }

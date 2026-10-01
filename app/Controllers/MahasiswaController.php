@@ -19,6 +19,7 @@ class MahasiswaController extends BaseController
             'mahasiswa' => $mhs,
             'prodiList' => (new ProdiModel())->orderBy('nama', 'ASC')->findAll(),
             'prodiById' => $prodiById,
+            'canWrite' => has_role('admin'),
         ];
         return view('master/mahasiswa', $data);
     }

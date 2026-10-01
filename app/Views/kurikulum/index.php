@@ -23,7 +23,9 @@
   <div>
     <div class="panel">
       <h2>CPL — <?= esc($prodi['nama']) ?></h2>
+      <?php if ($canWrite): ?>
       <form method="post" action="<?= site_url('kurikulum/cpl/store') ?>">
+<?= csrf_field() ?>
         <input type="hidden" name="prodi_id" value="<?= $prodi['id'] ?>">
         <div class="field-row">
           <div class="field"><label>Kode</label><input type="text" name="kode" placeholder="CPL-1" required></div>
@@ -31,6 +33,7 @@
         </div>
         <button type="submit" class="btn">Tambah CPL</button>
       </form>
+      <?php endif; ?>
       <div class="divider"></div>
       <?php if (empty($cplList)): ?>
         <div class="empty">Belum ada CPL.</div>
@@ -40,7 +43,7 @@
           <tr>
             <td class="mono"><?= esc($c['kode']) ?></td>
             <td><?= esc($c['deskripsi']) ?></td>
-            <td><a class="iconbtn" href="<?= site_url('kurikulum/cpl/delete/' . $c['id']) ?>" onclick="return confirm('Hapus CPL ini?')">Hapus</a></td>
+            <td><?= delete_form(site_url('kurikulum/cpl/delete/' . $c['id']), 'Hapus', 'Hapus CPL ini?') ?></td>
           </tr>
         <?php endforeach; ?>
         </tbody></table>
@@ -75,7 +78,9 @@
     <?php else: ?>
       <div class="panel">
         <h2>CPMK — <?= esc($mk['kode']) ?> <?= esc($mk['nama']) ?></h2>
+        <?php if ($canWrite): ?>
         <form method="post" action="<?= site_url('kurikulum/cpmk/store') ?>">
+<?= csrf_field() ?>
           <input type="hidden" name="mk_id" value="<?= $mk['id'] ?>">
           <input type="hidden" name="prodi_id" value="<?= $prodi['id'] ?>">
           <div class="field-row">
@@ -84,6 +89,7 @@
           </div>
           <button type="submit" class="btn">Tambah CPMK</button>
         </form>
+        <?php endif; ?>
         <div class="divider"></div>
         <?php if (empty($cpmkList)): ?>
           <div class="empty">Belum ada CPMK. CPL harus diisi terlebih dulu agar bisa dibebankan.</div>
@@ -92,7 +98,7 @@
             <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)">
               <div style="display:flex;justify-content:space-between;gap:10px">
                 <div><span class="mono" style="font-weight:600"><?= esc($cp['kode']) ?></span> — <?= esc($cp['deskripsi']) ?></div>
-                <a class="iconbtn" href="<?= site_url('kurikulum/cpmk/delete/' . $cp['id']) ?>" onclick="return confirm('Hapus CPMK ini?')">Hapus</a>
+                <?= delete_form(site_url('kurikulum/cpmk/delete/' . $cp['id']), 'Hapus', 'Hapus CPMK ini?') ?>
               </div>
               <div class="hint">Pembebanan ke CPL:</div>
               <table><tbody>
@@ -101,6 +107,7 @@
                   <td style="width:70px" class="mono"><?= esc($c['kode']) ?></td>
                   <td>
                     <form method="post" action="<?= site_url('kurikulum/cpmk/bobot') ?>" style="display:flex;gap:6px;align-items:center">
+<?= csrf_field() ?>
                       <input type="hidden" name="cpmk_id" value="<?= $cp['id'] ?>">
                       <input type="hidden" name="cpl_id" value="<?= $c['id'] ?>">
                       <input type="hidden" name="prodi_id" value="<?= $prodi['id'] ?>">

@@ -29,7 +29,10 @@
         </select>
       </div>
     </form>
+    <?php if (! $canWrite): ?><div class="empty">Anda hanya dapat melihat presensi kelas ini.</div><?php endif; ?>
+    <?php if ($canWrite): ?>
     <form method="post" action="<?= site_url('presensi/' . $kelas['id'] . '/simpan') ?>">
+<?= csrf_field() ?>
       <input type="hidden" name="minggu" value="<?= $minggu ?>">
       <div class="tbl-wrap"><table>
         <thead><tr><th>NIM</th><th>Nama</th><th style="width:220px">Status</th></tr></thead>
@@ -53,10 +56,14 @@
       </table></div>
       <button type="submit" class="btn sm" style="margin-top:12px">Simpan Presensi Pertemuan <?= $minggu ?></button>
     </form>
+    <?php endif; ?>
   </div>
 <?php else: ?>
   <div class="panel">
+    <?php if (! $canWrite): ?><div class="empty">Anda hanya dapat melihat nilai kelas ini.</div><?php endif; ?>
+    <?php if ($canWrite): ?>
     <form method="post" action="<?= site_url('presensi/' . $kelas['id'] . '/nilai') ?>">
+<?= csrf_field() ?>
       <div class="tbl-wrap"><table>
         <thead><tr><th>NIM</th><th>Nama</th>
           <?php foreach ($jenisPenilaian as $j): ?><th class="num"><?= esc($j['nama']) ?> (<?= $j['bobot'] ?>%)</th><?php endforeach; ?>
@@ -76,6 +83,7 @@
       </table></div>
       <button type="submit" class="btn sm" style="margin-top:12px">Simpan Nilai</button>
     </form>
+    <?php endif; ?>
   </div>
 <?php endif; ?>
 <?php endif; ?>

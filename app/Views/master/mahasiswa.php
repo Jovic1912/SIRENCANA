@@ -4,8 +4,10 @@
 <div class="pagehead"><div><h1>Mahasiswa</h1><p>Data induk mahasiswa — dipakai sebagai peserta kelas.</p></div></div>
 
 <div class="panel">
-  <h2>Tambah Mahasiswa</h2>
+  <?php if ($canWrite): ?>
+<h2>Tambah Mahasiswa</h2>
   <form method="post" action="<?= site_url('mahasiswa/store') ?>">
+<?= csrf_field() ?>
     <div class="field-row">
       <div class="field"><label>NIM</label><input type="text" name="nim" placeholder="mis. 2301020030" required></div>
       <div class="field"><label>Nama</label><input type="text" name="nama" placeholder="Nama lengkap" required></div>
@@ -20,6 +22,7 @@
     </div>
     <button type="submit" class="btn">Tambah Mahasiswa</button>
   </form>
+<?php endif; ?>
 </div>
 
 <div class="panel">
@@ -35,7 +38,7 @@
           <td class="mono"><?= esc($m['nim']) ?></td>
           <td><?= esc($m['nama']) ?></td>
           <td><?= esc($prodiById[$m['prodi_id']]['nama'] ?? '—') ?></td>
-          <td><a class="iconbtn" href="<?= site_url('mahasiswa/delete/' . $m['id']) ?>" onclick="return confirm('Hapus mahasiswa ini?')">Hapus</a></td>
+          <td><?php if ($canWrite): ?><?= delete_form(site_url('mahasiswa/delete/' . $m['id']), 'Hapus', 'Hapus mahasiswa ini?') ?><?php endif; ?></td>
         </tr>
       <?php endforeach; ?>
       </tbody>

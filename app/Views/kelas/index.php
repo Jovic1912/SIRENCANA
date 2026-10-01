@@ -3,12 +3,14 @@
 
 <div class="pagehead"><div><h1>Kelas &amp; Kontrak Kuliah</h1><p>Buka penawaran kelas dari RPS yang sudah sah, lalu kelola kontrak kuliah dan peserta.</p></div></div>
 
+<?php if ($canCreate): ?>
 <div class="panel">
   <h2>Buka Kelas Baru</h2>
   <?php if (empty($rpsSiap)): ?>
     <div class="empty">Belum ada RPS berstatus "Diarsipkan" yang bisa dipakai membuka kelas. Selesaikan alur persetujuan RPS terlebih dulu.</div>
   <?php else: ?>
     <form method="post" action="<?= site_url('kelas/store') ?>">
+<?= csrf_field() ?>
       <div class="field-row">
         <div class="field"><label>RPS (sudah diarsipkan)</label>
           <select name="rps_id" required>
@@ -35,6 +37,7 @@
   <?php endif; ?>
 </div>
 
+<?php endif; ?>
 <div class="panel">
   <h2>Daftar Kelas</h2>
   <?php if (empty($kelasAll)): ?>

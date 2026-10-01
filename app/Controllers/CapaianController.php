@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\Access;
 use App\Models\KelasModel;
 use App\Models\MataKuliahModel;
 use App\Models\PesertaKelasModel;
@@ -18,7 +19,7 @@ class CapaianController extends BaseController
     {
         $data = [
             'title'    => 'Capaian CPMK — Laporan OBE',
-            'kelasAll' => (new KelasModel())->orderBy('id', 'DESC')->findAll(),
+            'kelasAll' => Access::visibleKelas(),
             'mkById'   => array_column((new MataKuliahModel())->findAll(), null, 'id'),
         ];
         return view('capaian/pilih', $data);
@@ -84,6 +85,7 @@ class CapaianController extends BaseController
     {
         $kelas = (new KelasModel())->find($id);
         if (! $kelas) return redirect()->to(site_url('capaian'))->with('error', 'Kelas tidak ditemukan.');
+        if (! Access::canViewKelas($id)) return redirect()->to(site_url('capaian'))->with('error', 'Anda bukan pengampu kelas tersebut.');
 
         $hasil = self::hitung($kelas);
         $data = array_merge($hasil, [

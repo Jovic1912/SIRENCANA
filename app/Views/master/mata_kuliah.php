@@ -4,8 +4,10 @@
 <div class="pagehead"><div><h1>Mata Kuliah</h1><p>Data induk mata kuliah — kategori, sifat, bobot SKS, dan deskripsi.</p></div></div>
 
 <div class="panel">
-  <h2>Tambah Mata Kuliah</h2>
+  <?php if ($canWrite): ?>
+<h2>Tambah Mata Kuliah</h2>
   <form method="post" action="<?= site_url('mata-kuliah/store') ?>">
+<?= csrf_field() ?>
     <div class="field-row">
       <div class="field"><label>Kode MK</label><input type="text" name="kode" placeholder="IF301" required></div>
       <div class="field"><label>Nama MK</label><input type="text" name="nama" placeholder="Rekayasa Perangkat Lunak" required></div>
@@ -41,6 +43,7 @@
     <p class="hint">MK Fakultas/Universitas berlaku lintas program studi, sehingga Program Studi bersifat opsional.</p>
     <button type="submit" class="btn">Tambah Mata Kuliah</button>
   </form>
+<?php endif; ?>
 </div>
 
 <div class="panel">
@@ -68,7 +71,7 @@
           <td><?= esc($m['semester']) ?></td>
           <td title="<?= esc($desk) ?>"><?= esc($preview) ?: '<span class="muted">—</span>' ?></td>
           <td class="num"><?= $cpmkCount[$m['id']] ?? 0 ?></td>
-          <td><a class="iconbtn" href="<?= site_url('mata-kuliah/delete/' . $m['id']) ?>" onclick="return confirm('Hapus mata kuliah ini?')">Hapus</a></td>
+          <td><?php if ($canWrite): ?><?= delete_form(site_url('mata-kuliah/delete/' . $m['id']), 'Hapus', 'Hapus mata kuliah ini?') ?><?php endif; ?></td>
         </tr>
       <?php endforeach; ?>
       </tbody>

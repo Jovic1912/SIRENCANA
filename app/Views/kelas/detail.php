@@ -13,7 +13,10 @@
   <div>
     <div class="panel">
       <h2>Kontrak Kuliah</h2>
+      <?php if (! $canManage): ?><div class="empty">Anda hanya dapat melihat kontrak kelas ini.</div><?php endif; ?>
+      <?php if ($canManage): ?>
       <form method="post" action="<?= site_url('kelas/' . $kelas['id'] . '/kontrak') ?>">
+<?= csrf_field() ?>
         <div class="field-row">
           <div class="field"><label>Ruang</label><input type="text" name="jadwal_ruang" value="<?= esc($kontrak['jadwal_ruang'] ?? '') ?>"></div>
           <div class="field"><label>Hari</label><input type="text" name="jadwal_hari" value="<?= esc($kontrak['jadwal_hari'] ?? '') ?>"></div>
@@ -28,12 +31,15 @@
         <?php endif; ?>
         <button type="submit" class="btn sm">Simpan Kontrak</button>
       </form>
+      <?php endif; ?>
     </div>
   </div>
   <div>
     <div class="panel">
       <h2>Peserta Kelas (<?= count($peserta) ?>)</h2>
+      <?php if ($canManage): ?>
       <form method="post" action="<?= site_url('kelas/' . $kelas['id'] . '/peserta/add') ?>">
+<?= csrf_field() ?>
         <div class="field-row">
           <div class="field" style="flex:1">
             <select name="mahasiswa_id">
@@ -46,6 +52,7 @@
           <div><button type="submit" class="btn ghost sm">+ Tambah</button></div>
         </div>
       </form>
+      <?php endif; ?>
       <div class="tbl-wrap" style="max-height:400px;overflow-y:auto"><table>
         <thead><tr><th>NIM</th><th>Nama</th><th></th></tr></thead>
         <tbody>
@@ -53,7 +60,7 @@
           <tr>
             <td class="mono"><?= esc($m['nim'] ?? '—') ?></td>
             <td><?= esc($m['nama'] ?? '—') ?></td>
-            <td><a class="iconbtn" href="<?= site_url('kelas/' . $kelas['id'] . '/peserta/delete/' . $p['id']) ?>" onclick="return confirm('Keluarkan peserta ini?')">Keluarkan</a></td>
+            <td><?= delete_form(site_url('kelas/' . $kelas['id'] . '/peserta/delete/' . $p['id']), 'Keluarkan', 'Keluarkan peserta ini?') ?></td>
           </tr>
         <?php endforeach; ?>
         </tbody>

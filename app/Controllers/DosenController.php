@@ -12,6 +12,7 @@ class DosenController extends BaseController
         $data = [
             'title' => 'Dosen',
             'dosen' => $model->orderBy('nama', 'ASC')->findAll(),
+            'canWrite' => has_role('admin'),
         ];
         return view('master/dosen', $data);
     }

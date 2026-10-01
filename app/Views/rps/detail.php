@@ -25,56 +25,76 @@ foreach ($matriks as $m) { $matriksIndex[$m['jenis_penilaian_id']][$m['cpmk_id']
 
 <div class="panel">
   <h2>Tindakan Alur Kerja</h2>
-  <?php if (in_array($rps['status'], ['draft', 'revisi_diperlukan'], true)): ?>
-    <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/workflow/ajukan') ?>">
-      <div class="field"><label>Catatan pengajuan (opsional)</label><input type="text" name="catatan" placeholder="Catatan untuk GKM"></div>
-      <button type="submit" class="btn teal">Ajukan ke GKM</button>
-    </form>
-  <?php elseif ($rps['status'] === 'diajukan'): ?>
-    <p class="hint">Aksi Gugus Kendali Mutu (GKM):</p>
-    <form method="post" action="" onsubmit="return handleWorkflowSubmit(event)">
-      <div class="field"><label>Catatan review</label><textarea id="wfcatatan" placeholder="Catatan verifikasi (wajib jika meminta revisi)"></textarea></div>
-      <div style="display:flex;gap:10px">
-        <button type="button" class="btn amber" onclick="submitWf('<?= site_url('rps/' . $rps['id'] . '/workflow/revisi') ?>')">Kembalikan untuk Revisi</button>
-        <button type="button" class="btn teal" onclick="submitWf('<?= site_url('rps/' . $rps['id'] . '/workflow/setuju') ?>')">Setujui Dokumen</button>
-      </div>
-    </form>
-    <form id="wfhiddenform" method="post" action="">
-      <input type="hidden" name="catatan" id="wfcatatanhidden">
-    </form>
-  <?php elseif ($rps['status'] === 'disetujui_gkm'): ?>
-    <p class="hint">Pengesahan — memerlukan tanda tangan Dosen dan Koordinator Program Studi (Kaprodi):</p>
-    <div style="display:flex;gap:10px">
-      <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/workflow/ttd-dosen') ?>">
-        <button type="submit" class="btn <?= $rps['ttd_dosen'] ? 'ghost' : '' ?>" <?= $rps['ttd_dosen'] ? 'disabled' : '' ?>><?= $rps['ttd_dosen'] ? '✓ Dosen sudah TTD' : 'Tanda Tangan Dosen' ?></button>
+  <?php $st = $rps['status']; ?>
+
+  <?php if (in_array($st, ['draft', 'revisi_diperlukan'], true)): ?>
+    <?php if ($canAjukan): ?>
+      <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/workflow/ajukan') ?>">
+        <?= csrf_field() ?>
+        <?php if ($st === 'revisi_diperlukan'): ?><p class="hint">GKM meminta revisi. Lihat catatannya di Riwayat Status di bawah, perbaiki, lalu ajukan ulang.</p><?php endif; ?>
+        <div class="field"><label>Catatan pengajuan (opsional)</label><input type="text" name="catatan" placeholder="Catatan untuk GKM"></div>
+        <button type="submit" class="btn teal">Ajukan ke GKM</button>
       </form>
-      <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/workflow/ttd-kaprodi') ?>">
-        <button type="submit" class="btn <?= $rps['ttd_kaprodi'] ? 'ghost' : '' ?>" <?= $rps['ttd_kaprodi'] ? 'disabled' : '' ?>><?= $rps['ttd_kaprodi'] ? '✓ Kaprodi sudah TTD' : 'Tanda Tangan Kaprodi' ?></button>
+    <?php else: ?>
+      <p class="hint">Menunggu pengembang RPS (<?= esc($dosenById[$rps['pengembang_id']]['nama'] ?? '—') ?>) menyelesaikan dan mengajukan dokumen ini.</p>
+    <?php endif; ?>
+
+  <?php elseif ($st === 'diajukan'): ?>
+    <?php if ($canReview): ?>
+      <p class="hint">Aksi Gugus Kendali Mutu (GKM):</p>
+      <form id="wfReview" method="post" action="">
+        <?= csrf_field() ?>
+        <div class="field"><label>Catatan review</label><textarea name="catatan" id="wfcatatan" placeholder="Catatan verifikasi (wajib jika meminta revisi)"></textarea></div>
+        <div style="display:flex;gap:10px">
+          <button type="submit" class="btn amber" formaction="<?= site_url('rps/' . $rps['id'] . '/workflow/revisi') ?>">Kembalikan untuk Revisi</button>
+          <button type="submit" class="btn teal" formaction="<?= site_url('rps/' . $rps['id'] . '/workflow/setuju') ?>">Setujui Dokumen</button>
+        </div>
       </form>
+    <?php else: ?>
+      <p class="hint">Menunggu pemeriksaan GKM.</p>
+    <?php endif; ?>
+
+  <?php elseif ($st === 'disetujui_gkm'): ?>
+    <p class="hint">Pengesahan — memerlukan tanda tangan Dosen pengembang dan Koordinator Program Studi (Kaprodi):</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <?php if ($rps['ttd_dosen']): ?>
+        <span class="badge diarsipkan">✓ Dosen sudah TTD</span>
+      <?php elseif ($canTtdDosen): ?>
+        <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/workflow/ttd-dosen') ?>"><?= csrf_field() ?><button type="submit" class="btn">Tanda Tangan Dosen</button></form>
+      <?php else: ?>
+        <span class="badge draft">Menunggu TTD Dosen</span>
+      <?php endif; ?>
+
+      <?php if ($rps['ttd_kaprodi']): ?>
+        <span class="badge diarsipkan">✓ Kaprodi sudah TTD</span>
+      <?php elseif ($canTtdKaprodi): ?>
+        <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/workflow/ttd-kaprodi') ?>"><?= csrf_field() ?><button type="submit" class="btn">Tanda Tangan Kaprodi</button></form>
+      <?php else: ?>
+        <span class="badge draft">Menunggu TTD Kaprodi</span>
+      <?php endif; ?>
     </div>
-  <?php elseif ($rps['status'] === 'ditandatangani'): ?>
-    <p class="hint">Dokumen sah. Serahkan ke Gugus Penjamin Mutu (GPM) dan arsipkan:</p>
-    <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/workflow/arsip') ?>">
-      <div class="field"><label>Lokasi arsip / tautan penyimpanan</label><input type="text" name="lokasi" placeholder="mis. Drive Prodi / lemari arsip B-12"></div>
-      <button type="submit" class="btn teal">Serahkan ke GPM &amp; Arsipkan</button>
-    </form>
-  <?php elseif ($rps['status'] === 'diarsipkan'): ?>
+
+  <?php elseif ($st === 'ditandatangani'): ?>
+    <?php if ($canArsip): ?>
+      <p class="hint">Dokumen sah. Serahkan ke Gugus Penjamin Mutu (GPM) dan arsipkan:</p>
+      <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/workflow/arsip') ?>">
+        <?= csrf_field() ?>
+        <div class="field"><label>Lokasi arsip / tautan penyimpanan</label><input type="text" name="lokasi" placeholder="mis. Drive Prodi / lemari arsip B-12"></div>
+        <button type="submit" class="btn teal">Serahkan ke GPM &amp; Arsipkan</button>
+      </form>
+    <?php else: ?>
+      <p class="hint">Dokumen sah. Menunggu diserahkan ke GPM dan diarsipkan.</p>
+    <?php endif; ?>
+
+  <?php elseif ($st === 'diarsipkan'): ?>
     <p class="hint">Dokumen sudah diarsipkan<?= $rps['arsip_lokasi'] ? ' di ' . esc($rps['arsip_lokasi']) : '' ?>. Siap dipakai untuk membuka kelas.</p>
   <?php endif; ?>
 </div>
-<script>
-function submitWf(action){
-  var catatan = document.getElementById('wfcatatan').value;
-  var f = document.getElementById('wfhiddenform');
-  f.action = action;
-  document.getElementById('wfcatatanhidden').value = catatan;
-  f.submit();
-}
-</script>
 
 <div class="panel" id="pertemuan">
   <h2>A. Rancangan 16 Pertemuan</h2>
   <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/pertemuan') ?>">
+<?= csrf_field() ?>
     <div class="tbl-wrap"><table>
       <thead><tr><th style="width:36px">Mg</th><th>Sub-CPMK</th><th>Materi</th><th>Model</th><th>Bentuk</th><th>Indikator</th><th style="width:70px">Bobot%</th></tr></thead>
       <tbody>
@@ -109,6 +129,7 @@ function submitWf(action){
 <div class="panel" id="penilaian">
   <h2>B. Jenis &amp; Bobot Penilaian</h2>
   <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/jenis/update') ?>">
+<?= csrf_field() ?>
     <div class="tbl-wrap"><table>
       <thead><tr><th>Jenis Penilaian</th><th style="width:100px">Bobot %</th><th></th></tr></thead>
       <tbody>
@@ -116,7 +137,7 @@ function submitWf(action){
         <tr>
           <td><?php if ($editable): ?><input name="j[<?= $j['id'] ?>][nama]" value="<?= esc($j['nama']) ?>"><?php else: ?><?= esc($j['nama']) ?><?php endif; ?></td>
           <td><?php if ($editable): ?><input class="matrix-input" type="number" name="j[<?= $j['id'] ?>][bobot]" value="<?= $j['bobot'] ?>"><?php else: ?><?= $j['bobot'] ?><?php endif; ?></td>
-          <td><?php if ($editable): ?><a class="iconbtn" href="<?= site_url('rps/' . $rps['id'] . '/jenis/delete/' . $j['id']) ?>" onclick="return confirm('Hapus jenis penilaian ini?')">Hapus</a><?php endif; ?></td>
+          <td><?php if ($editable): ?><button type="submit" class="iconbtn" formaction="<?= site_url('rps/' . $rps['id'] . '/jenis/delete/' . $j['id']) ?>" formnovalidate onclick="return confirm('Hapus jenis penilaian ini?')">Hapus</button><?php endif; ?></td>
         </tr>
       <?php endforeach; ?>
       </tbody>
@@ -126,6 +147,7 @@ function submitWf(action){
   </form>
   <?php if ($editable): ?>
   <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/jenis/add') ?>" style="margin-top:8px">
+<?= csrf_field() ?>
     <button type="submit" class="btn ghost sm">+ Tambah jenis penilaian</button>
   </form>
   <?php endif; ?>
@@ -138,6 +160,7 @@ function submitWf(action){
     <div class="empty">Mata kuliah ini belum memiliki CPMK. Tambahkan di menu Kurikulum &amp; CPMK.</div>
   <?php else: ?>
     <form method="post" action="<?= site_url('rps/' . $rps['id'] . '/matriks') ?>">
+<?= csrf_field() ?>
       <div class="tbl-wrap"><table>
         <thead><tr><th>Jenis Penilaian</th><?php foreach ($cpmkList as $c): ?><th class="num"><?= esc($c['kode']) ?></th><?php endforeach; ?></tr></thead>
         <tbody>

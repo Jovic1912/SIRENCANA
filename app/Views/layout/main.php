@@ -16,22 +16,44 @@
       <div class="sub">Sistem Perancangan &amp; Penjaminan Mutu Pembelajaran OBE</div>
     </div>
     <nav>
-      <a href="<?= site_url('/') ?>" class="<?= uri_string() === '' ? 'active' : '' ?>">Dasbor</a>
-      <div class="group-label">Data Induk</div>
-      <a href="<?= site_url('prodi') ?>" class="<?= str_starts_with(uri_string(),'prodi') ? 'active' : '' ?>">Program Studi</a>
-      <a href="<?= site_url('dosen') ?>" class="<?= str_starts_with(uri_string(),'dosen') ? 'active' : '' ?>">Dosen</a>
-      <a href="<?= site_url('mahasiswa') ?>" class="<?= str_starts_with(uri_string(),'mahasiswa') ? 'active' : '' ?>">Mahasiswa</a>
-      <a href="<?= site_url('mata-kuliah') ?>" class="<?= str_starts_with(uri_string(),'mata-kuliah') ? 'active' : '' ?>">Mata Kuliah</a>
+      <?php $u = uri_string(); $on = static fn (string $p) => str_starts_with($u, $p) ? 'active' : ''; ?>
+      <a href="<?= site_url('/') ?>" class="<?= $u === '' ? 'active' : '' ?>">Dasbor</a>
+
+      <?php if (has_role('admin', 'kaprodi')): ?>
+        <div class="group-label">Data Induk</div>
+        <a href="<?= site_url('prodi') ?>" class="<?= $on('prodi') ?>">Program Studi</a>
+        <a href="<?= site_url('dosen') ?>" class="<?= $on('dosen') ?>">Dosen</a>
+        <a href="<?= site_url('mahasiswa') ?>" class="<?= $on('mahasiswa') ?>">Mahasiswa</a>
+        <a href="<?= site_url('mata-kuliah') ?>" class="<?= $on('mata-kuliah') ?>">Mata Kuliah</a>
+      <?php endif; ?>
+
       <div class="group-label">Perancangan Pembelajaran</div>
-      <a href="<?= site_url('kurikulum') ?>" class="<?= str_starts_with(uri_string(),'kurikulum') ? 'active' : '' ?>">Kurikulum &amp; CPMK</a>
-      <a href="<?= site_url('rps') ?>" class="<?= str_starts_with(uri_string(),'rps') ? 'active' : '' ?>">RPS &amp; Persetujuan</a>
-      <a href="<?= site_url('kelas') ?>" class="<?= str_starts_with(uri_string(),'kelas') ? 'active' : '' ?>">Kelas &amp; Kontrak</a>
+      <a href="<?= site_url('kurikulum') ?>" class="<?= $on('kurikulum') ?>">Kurikulum &amp; CPMK</a>
+      <a href="<?= site_url('rps') ?>" class="<?= $on('rps') ?>">RPS &amp; Persetujuan</a>
+      <?php if (has_role('admin', 'kaprodi', 'dosen')): ?>
+        <a href="<?= site_url('kelas') ?>" class="<?= $on('kelas') ?>">Kelas &amp; Kontrak</a>
+      <?php endif; ?>
+
       <div class="group-label">Pelaksanaan &amp; Pelaporan</div>
-      <a href="<?= site_url('presensi') ?>" class="<?= str_starts_with(uri_string(),'presensi') ? 'active' : '' ?>">Presensi &amp; Nilai</a>
-      <a href="<?= site_url('capaian') ?>" class="<?= str_starts_with(uri_string(),'capaian') ? 'active' : '' ?>">Capaian CPMK</a>
-      <a href="<?= site_url('portofolio') ?>" class="<?= str_starts_with(uri_string(),'portofolio') ? 'active' : '' ?>">Portofolio MK</a>
+      <?php if (has_role('admin', 'kaprodi', 'dosen')): ?>
+        <a href="<?= site_url('presensi') ?>" class="<?= $on('presensi') ?>">Presensi &amp; Nilai</a>
+      <?php endif; ?>
+      <a href="<?= site_url('capaian') ?>" class="<?= $on('capaian') ?>">Capaian CPMK</a>
+      <a href="<?= site_url('portofolio') ?>" class="<?= $on('portofolio') ?>">Portofolio MK</a>
+
+      <?php if (has_role('admin')): ?>
+        <div class="group-label">Administrasi</div>
+        <a href="<?= site_url('users') ?>" class="<?= $on('users') ?>">Pengguna</a>
+      <?php endif; ?>
     </nav>
-    <div id="sidebar-foot">CodeIgniter 4 &middot; Database <?= esc(db_connect()->getPlatform()) ?></div>
+    <div id="sidebar-foot">
+      <div style="color:#e8e6de;font-weight:600;font-size:.8rem"><?= esc(user_name()) ?></div>
+      <div style="margin-bottom:8px"><?= esc(role_label(session()->get('role'))) ?></div>
+      <a href="<?= site_url('ganti-password') ?>" style="color:#b9c0d4;font-size:.74rem;text-decoration:none;padding:0">Ganti password</a>
+      <form method="post" action="<?= site_url('logout') ?>" style="margin-top:6px"><?= csrf_field() ?>
+        <button type="submit" style="background:none;border:none;color:#e0c98a;font:inherit;font-size:.74rem;cursor:pointer;padding:0">Keluar</button>
+      </form>
+    </div>
   </aside>
   <main id="main">
     <?php if (session()->getFlashdata('success')): ?>

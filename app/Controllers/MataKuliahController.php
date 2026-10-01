@@ -28,6 +28,7 @@ class MataKuliahController extends BaseController
             'prodiList' => (new ProdiModel())->orderBy('nama', 'ASC')->findAll(),
             'prodiById' => $prodiById,
             'cpmkCount' => $cpmkCount,
+            'canWrite' => has_role('admin', 'kaprodi'),
         ];
         return view('master/mata_kuliah', $data);
     }
