@@ -101,7 +101,7 @@ class KelasController extends BaseController
         $pesertaIds = array_column($peserta, 'mahasiswa_id');
 
         $mhsModel = new MahasiswaModel();
-        if ($mk['prodi_id']) {
+        if (! empty($mk['prodi_id'])) {
             $eligibleMhs = $mhsModel->groupStart()->where('prodi_id', $mk['prodi_id'])->orWhere('prodi_id', null)->groupEnd()->findAll();
         } else {
             $eligibleMhs = $mhsModel->findAll();
