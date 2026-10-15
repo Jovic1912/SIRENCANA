@@ -39,6 +39,7 @@ td.num, th.num{text-align:right; font-family:'IBM Plex Mono',monospace;}
 label{display:block; font-size:.76rem; color:var(--ink-soft); margin-bottom:3px;}
 input,select,textarea{width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper); color:var(--ink); font-family:inherit; font-size:.86rem;}
 textarea{min-height:70px; resize:vertical;}
+input[type=checkbox],input[type=radio]{width:auto; padding:0; margin:0; flex-shrink:0;}
 .field{margin-bottom:11px;}
 .field-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:11px;}
 .btn{cursor:pointer; padding:8px 15px; border-radius:var(--radius); font-size:.82rem; font-weight:600; background:var(--navy); color:#fff; border:none; display:inline-block; text-align:center; text-decoration:none;}
@@ -72,6 +73,18 @@ textarea{min-height:70px; resize:vertical;}
 .alert.success{background:var(--green-soft); color:var(--green);}
 .alert.error{background:var(--red-soft); color:var(--red);}
 .muted{color:var(--ink-soft);}
+.panel > h2 .badge, .panel > h2 .muted{margin-left:6px; font-size:.72rem; font-weight:600; vertical-align:middle;}
+.kv{display:grid; grid-template-columns:120px 1fr; gap:8px 14px; margin:0 0 12px; font-size:.86rem;}
+.kv dt{color:var(--ink-soft); font-weight:600;}
+.kv dd{margin:0;}
+.prewrap{white-space:pre-line;}
+.field-row.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+@media (max-width:520px){ .field-row.cols-3{grid-template-columns:1fr;} }
+.ttd-box{border:1px solid var(--line); border-radius:var(--radius); background:var(--paper); padding:10px 12px; margin:4px 0 14px;}
+.check-line{display:flex; align-items:flex-start; gap:9px; margin:0; font-size:.84rem; line-height:1.4; color:var(--ink); cursor:pointer;}
+.check-line input{margin-top:3px;}
+.ttd-box .hint{margin:6px 0 0 22px;}
+.form-actions{display:flex; justify-content:flex-end;}
 
 .iconbtn{font-family:inherit;padding:0;}
 button.link{background:none;border:none;cursor:pointer;font-family:inherit;padding:0;}

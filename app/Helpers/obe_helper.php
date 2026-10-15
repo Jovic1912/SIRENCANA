@@ -23,6 +23,26 @@ if (! function_exists('status_badge')) {
     }
 }
 
+if (! function_exists('tanggal_id')) {
+    /** Format tanggal Indonesia, mis. "7 Oktober 2026". */
+    function tanggal_id(?string $datetime): string
+    {
+        if (empty($datetime) || ($ts = strtotime($datetime)) === false) return '—';
+        $bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli',
+                  'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        return date('j', $ts) . ' ' . $bulan[(int) date('n', $ts)] . ' ' . date('Y', $ts);
+    }
+}
+
+if (! function_exists('gabung_teks')) {
+    /** Gabungkan bagian teks yang tidak kosong dengan pemisah, mis. "Ganjil · 2026/2027". */
+    function gabung_teks(array $bagian, string $pemisah = ' · '): string
+    {
+        $bagian = array_filter(array_map(fn ($b) => trim((string) $b), $bagian), fn ($b) => $b !== '');
+        return $bagian ? implode($pemisah, $bagian) : '—';
+    }
+}
+
 if (! function_exists('nilai_huruf')) {
     function nilai_huruf(float $n): string
     {
