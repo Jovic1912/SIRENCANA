@@ -5,21 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= esc($title ?? 'Masuk') ?> — SIRENCANA</title>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= base_url('assets/style.css') ?>">
-<style>
-  .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--navy)}
-  .auth-card{width:100%;max-width:400px;background:var(--paper-raised);border-radius:var(--radius);padding:32px 30px}
-  .auth-card h1{font-size:1.6rem;margin-bottom:2px}
-  .auth-card .sub{color:var(--ink-soft);font-size:.82rem;margin-bottom:22px}
-</style>
+<!-- Tailwind CSS dengan skema biru, emas, kuning -->
+<link rel="stylesheet" href="<?= base_url('assets/css/output.css') ?>">
 </head>
-<body>
-<div class="auth-wrap">
-  <div class="auth-card">
-    <?php if (session()->getFlashdata('success')): ?><div class="alert success"><?= esc(session()->getFlashdata('success')) ?></div><?php endif; ?>
-    <?php if (session()->getFlashdata('error')): ?><div class="alert error"><?= esc(session()->getFlashdata('error')) ?></div><?php endif; ?>
+<body class="bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 min-h-screen">
+
+<!-- Auth Wrapper dengan background gradasi biru elegant -->
+<div class="min-h-screen flex items-center justify-center px-6 py-12">
+  
+  <!-- Auth Card dengan border kuning gelap -->
+  <div class="w-full max-w-md bg-white rounded-lg shadow-2xl border-2 border-yellow-dark p-8">
+    
+    <!-- Brand Header -->
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-serif font-bold text-gradient-blue mb-2">
+        SIRENCANA
+      </h1>
+      <p class="text-sm text-primary-700">
+        Sistem Perancangan &amp; Penjaminan Mutu Pembelajaran OBE
+      </p>
+    </div>
+    <!-- Flash Messages -->
+    <?php if (session()->getFlashdata('success')): ?>
+      <div class="alert alert-success mb-4">
+        <?= esc(session()->getFlashdata('success')) ?>
+      </div>
+    <?php endif; ?>
+    
+    <?php if (session()->getFlashdata('error')): ?>
+      <div class="alert alert-error mb-4">
+        <?= esc(session()->getFlashdata('error')) ?>
+      </div>
+    <?php endif; ?>
+    
+    <!-- Content -->
     <?= $this->renderSection('content') ?>
+    
   </div>
 </div>
+
 </body>
 </html>

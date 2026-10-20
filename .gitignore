@@ -13,3 +13,11 @@ node_modules/
 .idea/
 Thumbs.db
 *.log
+
+
+# Node modules (Tailwind CSS)
+node_modules/
+package-lock.json
+
+# Generated CSS (Tailwind output)
+public/assets/css/output.css
