@@ -1,0 +1,855 @@
+================================================================================
+DESKRIPSI DETAIL PROJECT SIRENCANA
+Sistem Informasi Rencana Pembelajaran & Penjaminan Mutu OBE
+================================================================================
+
+Terakhir diperbarui: 27 Oktober 2026
+Framework: CodeIgniter 4
+Database: MySQL/MariaDB
+Peran Pengguna: admin, dosen, gkm (Gugus Kendali Mutu), kaprodi, gpm (Gugus 
+               Penjaminan Mutu)
+
+
+================================================================================
+A. FITUR YANG SUDAH TERVERIFIKASI ADA
+================================================================================
+Fitur-fitur di bawah ini SUDAH TERBUKTI ADA dengan controller, model, route,
+view, dan tabel database yang eksplisit.
+
+
+1. AUTENTIKASI & MANAJEMEN USER
+────────────────────────────────────────────────────────────────────────────
+   ✓ Login & logout (AuthController::login, ::attempt, ::logout)
+   ✓ Ganti password (AuthController::password, ::updatePassword)
+   ✓ CRUD pengguna - hanya admin (UserController::index, ::store, ::edit, 
+     ::update, ::delete)
+   ✓ Reset password pengguna - admin (UserController::resetPassword)
+   ✓ 5 role dengan hak akses berbeda: admin, dosen, gkm, kaprodi, gpm
+   ✓ Filter autentikasi (AuthFilter) dan filter role (RoleFilter)
+   ✓ Library Access untuk validasi kepemilikan data dan otorisasi berlapis
+
+   Route:
+   - GET  /login
+   - POST /login
+   - POST /logout (filter: auth)
+   - GET  /ganti-password (filter: auth)
+   - POST /ganti-password (filter: auth)
+   - GET  /users (filter: role:admin)
+   - POST /users/store (filter: role:admin)
+   - GET  /users/edit/{id} (filter: role:admin)
+   - POST /users/update/{id} (filter: role:admin)
+   - POST /users/reset/{id} (filter: role:admin)
+   - POST /users/delete/{id} (filter: role:admin)
+
+   Tabel: users
+   Kolom: id, username, password, nama, role, aktif, dosen_id, created_at
+
+
+2. MASTER DATA
+────────────────────────────────────────────────────────────────────────────
+   a. PRODI (Program Studi)
+      ✓ CRUD prodi (ProdiController)
+      ✓ Create: admin only
+      ✓ Read: admin & kaprodi
+      
+      Route:
+      - GET  /prodi (filter: role:admin,kaprodi)
+      - POST /prodi/store (filter: role:admin)
+      - POST /prodi/delete/{id} (filter: role:admin)
+      
+      Tabel: prodi
+      Kolom: id, nama, jurusan, fakultas
+
+   b. DOSEN
+      ✓ CRUD dosen (DosenController)
+      ✓ Create & delete: admin only
+      ✓ Read: admin & kaprodi
+      
+      Route:
+      - GET  /dosen (filter: role:admin,kaprodi)
+      - POST /dosen/store (filter: role:admin)
+      - POST /dosen/delete/{id} (filter: role:admin)
+      
+      Tabel: dosen
+      Kolom: id, nama, nidn
+
+   c. MAHASISWA
+      ✓ CRUD mahasiswa (MahasiswaController)
+      ✓ Terhubung dengan prodi (foreign key)
+      ✓ NIM unique
+      
+      Route:
+      - GET  /mahasiswa (filter: role:admin,kaprodi)
+      - POST /mahasiswa/store (filter: role:admin)
+      - POST /mahasiswa/delete/{id} (filter: role:admin)
+      
+      Tabel: mahasiswa
+      Kolom: id, nim (unique), nama, prodi_id
+
+   d. MATA KULIAH
+      ✓ CRUD mata kuliah (MataKuliahController)
+      ✓ Create & delete: admin & kaprodi
+      ✓ Atribut lengkap: kode, nama, tingkat_mk (Universitas/Fakultas/Prodi),
+        prodi_id, rumpun_mk, sifat_mk (Wajib/Pilihan), sks, semester 
+        (Ganjil/Genap), deskripsi
+      
+      Route:
+      - GET  /mata-kuliah (filter: role:admin,kaprodi)
+      - POST /mata-kuliah/store (filter: role:admin,kaprodi)
+      - POST /mata-kuliah/delete/{id} (filter: role:admin,kaprodi)
+      
+      Tabel: mata_kuliah
+      Kolom: id, kode, nama, tingkat_mk, prodi_id, rumpun_mk, sifat_mk, sks,
+             semester, deskripsi
+
+
+3. KURIKULUM & CAPAIAN PEMBELAJARAN
+────────────────────────────────────────────────────────────────────────────
+   a. CPL (Capaian Pembelajaran Lulusan)
+      ✓ CRUD CPL per prodi (KurikulumController::storeCpl, ::deleteCpl)
+      ✓ Create & delete: admin & kaprodi
+      ✓ Terhubung dengan prodi
+      
+      Route:
+      - GET  /kurikulum (filter: auth)
+      - POST /kurikulum/cpl/store (filter: role:admin,kaprodi)
+      - POST /kurikulum/cpl/delete/{id} (filter: role:admin,kaprodi)
+      
+      Tabel: cpl
+      Kolom: id, prodi_id, kode, deskripsi
+
+   b. CPMK (Capaian Pembelajaran Mata Kuliah)
+      ✓ CRUD CPMK per mata kuliah (KurikulumController::storeCpmk, ::deleteCpmk)
+      ✓ Create & delete: admin & kaprodi
+      ✓ Terhubung dengan mata_kuliah
+      
+      Route:
+      - POST /kurikulum/cpmk/store (filter: role:admin,kaprodi)
+      - POST /kurikulum/cpmk/delete/{id} (filter: role:admin,kaprodi)
+      
+      Tabel: cpmk
+      Kolom: id, mk_id, kode, deskripsi
+
+   c. MATRIKS BOBOT CPMK → CPL
+      ✓ Pengaturan bobot (0-100) untuk setiap pasangan CPMK-CPL
+      ✓ Update batch bobot (KurikulumController::setBobot)
+      ✓ Update: admin & kaprodi
+      
+      Route:
+      - POST /kurikulum/cpmk/bobot (filter: role:admin,kaprodi)
+      
+      Tabel: cpmk_cpl
+      Kolom: id, cpmk_id, cpl_id, bobot (decimal 5,2)
+
+
+4. RPS (RENCANA PEMBELAJARAN SEMESTER)
+────────────────────────────────────────────────────────────────────────────
+   ✓ Controller: RpsController (14 method)
+   ✓ Model: RpsModel, RpsPertemuanModel, JenisPenilaianModel, 
+            MatriksPenilaianModel, RpsStatusLogModel
+
+   a. PEMBUATAN RPS
+      ✓ Create draf RPS (RpsController::store)
+      ✓ Dosen: otomatis jadi pengembang
+      ✓ Admin: bisa pilih dosen pengembang
+      ✓ Auto-generate 16 pertemuan kosong
+      ✓ Auto-generate 3 jenis penilaian default: Tugas 30%, UTS 30%, UAS 40%
+      
+      Route:
+      - GET  /rps (filter: auth)
+      - POST /rps/store (filter: role:dosen,admin)
+      - GET  /rps/{id} (filter: auth, validasi kepemilikan)
+      
+      Tabel: rps
+      Kolom: id, mk_id, tahun_akademik, pengembang_id, koor_prodi_id, status,
+             ttd_dosen, ttd_kaprodi, arsip_gpm, arsip_lokasi, created_at
+
+   b. 16 PERTEMUAN
+      ✓ Update batch 16 pertemuan (RpsController::updatePertemuan)
+      ✓ Editable saat status = draft / revisi_diperlukan
+      ✓ Kolom per pertemuan: minggu (1-16), sub_cpmk, indikator, materi, 
+        model pembelajaran, bentuk (Luring/Daring/Blended), bobot, flag 
+        is_uts, is_uas
+      
+      Route:
+      - POST /rps/{id}/pertemuan (filter: role:dosen,admin)
+      
+      Tabel: rps_pertemuan
+      Kolom: id, rps_id, minggu, sub_cpmk, indikator, materi, model, bentuk,
+             bobot, is_uts, is_uas
+
+   c. JENIS PENILAIAN
+      ✓ CRUD dinamis (RpsController::addJenis, ::deleteJenis, ::updateJenis)
+      ✓ Nama + bobot persen
+      ✓ Validasi total bobot = 100% sebelum diajukan
+      
+      Route:
+      - POST /rps/{id}/jenis/add (filter: role:dosen,admin)
+      - POST /rps/{id}/jenis/delete/{jenis_id} (filter: role:dosen,admin)
+      - POST /rps/{id}/jenis/update (filter: role:dosen,admin)
+      
+      Tabel: jenis_penilaian
+      Kolom: id, rps_id, nama, bobot
+
+   d. MATRIKS PENILAIAN (Jenis Penilaian × CPMK)
+      ✓ Grid 2 dimensi: jenis_penilaian_id × cpmk_id
+      ✓ Bobot per sel (0-100)
+      ✓ Update batch (RpsController::updateMatriks)
+      ✓ Insert jika bobot > 0, delete jika bobot = 0
+      
+      Route:
+      - POST /rps/{id}/matriks (filter: role:dosen,admin)
+      
+      Tabel: matriks_penilaian
+      Kolom: id, rps_id, jenis_penilaian_id, cpmk_id, bobot
+
+   e. ALUR PERSETUJUAN RPS (WORKFLOW)
+      ✓ 6 aksi transisi status dengan log otomatis:
+      
+      1) AJUKAN (draft/revisi_diperlukan → diajukan)
+         - Hanya pengembang RPS
+         - Validasi total bobot jenis penilaian = 100%
+         - Route: POST /rps/{id}/workflow/ajukan (filter: role:dosen,admin)
+         - Method: RpsController::wfAjukan
+      
+      2) REVISI (diajukan → revisi_diperlukan)
+         - Hanya GKM
+         - Catatan wajib diisi
+         - Route: POST /rps/{id}/workflow/revisi (filter: role:gkm)
+         - Method: RpsController::wfRevisi
+      
+      3) SETUJU (diajukan → disetujui_gkm)
+         - Hanya GKM
+         - Route: POST /rps/{id}/workflow/setuju (filter: role:gkm)
+         - Method: RpsController::wfSetuju
+      
+      4) TTD DOSEN (disetujui_gkm → ttd_dosen flag = 1)
+         - Hanya dosen pengembang atau kaprodi (jika kaprodi = dosen)
+         - Set flag ttd_dosen = 1
+         - Route: POST /rps/{id}/workflow/ttd-dosen (filter: role:dosen,kaprodi)
+         - Method: RpsController::wfTtdDosen
+      
+      5) TTD KAPRODI (disetujui_gkm → ttd_kaprodi flag = 1)
+         - Hanya kaprodi yang ditetapkan di rps.koor_prodi_id
+         - Set flag ttd_kaprodi = 1
+         - Route: POST /rps/{id}/workflow/ttd-kaprodi (filter: role:kaprodi)
+         - Method: RpsController::wfTtdKaprodi
+         
+         Auto-transisi: jika ttd_dosen=1 DAN ttd_kaprodi=1 → status = 
+         ditandatangani
+      
+      6) ARSIP (ditandatangani → diarsipkan)
+         - Hanya GPM atau kaprodi
+         - Input lokasi arsip fisik (opsional)
+         - Set flag arsip_gpm = 1
+         - Route: POST /rps/{id}/workflow/arsip (filter: role:gpm,kaprodi)
+         - Method: RpsController::wfArsip
+      
+      Tabel: rps_status_log
+      Kolom: id, rps_id, status, catatan, oleh (nama + role), tanggal
+      
+      Status yang ada:
+      - draft
+      - diajukan
+      - revisi_diperlukan
+      - disetujui_gkm
+      - ditandatangani
+      - diarsipkan
+
+   f. VISIBILITAS RPS
+      ✓ Dosen: hanya RPS yang dia kembangkan
+      ✓ Admin & kaprodi: semua RPS
+      ✓ GKM & GPM: RPS dengan status != draft
+      ✓ Validasi di Access::canViewRps() dan Access::canEditRps()
+
+
+5. KELAS & KONTRAK KULIAH
+────────────────────────────────────────────────────────────────────────────
+   ✓ Controller: KelasController (7 method)
+   ✓ Model: KelasModel, KelasDosenModel, KontrakKuliahModel, PesertaKelasModel
+
+   a. PENAWARAN KELAS
+      ✓ Create kelas dari RPS yang sudah diarsipkan (KelasController::store)
+      ✓ Atribut: label kelas, semester, tahun akademik, jumlah pertemuan (16)
+      ✓ Create: admin & kaprodi
+      ✓ Auto-create kontrak_kuliah kosong
+      ✓ Auto-create portofolio kosong
+      
+      Route:
+      - GET  /kelas (filter: role:admin,kaprodi,dosen)
+      - POST /kelas/store (filter: role:admin,kaprodi)
+      - GET  /kelas/{id} (filter: role:admin,kaprodi,dosen)
+      
+      Tabel: kelas
+      Kolom: id, mk_id, rps_id, label, semester, tahun_akademik, 
+             jumlah_pertemuan
+
+   b. TEAM TEACHING (Dosen Pengampu)
+      ✓ Multiple dosen per kelas (relasi many-to-many)
+      ✓ Pilih dosen saat create kelas
+      ✓ Tidak ada CRUD individual untuk kelas_dosen (diatur saat create kelas)
+      
+      Tabel: kelas_dosen
+      Kolom: id, kelas_id, dosen_id
+
+   c. KONTRAK KULIAH
+      ✓ Update kontrak per kelas (KelasController::updateKontrak)
+      ✓ Kolom: jadwal_ruang, jadwal_hari, jadwal_jam, klausa (rules kesepakatan),
+        ttd (flag 0/1), tgl_ttd
+      ✓ Update: dosen pengampu, kaprodi, admin
+      
+      Route:
+      - POST /kelas/{id}/kontrak (filter: role:admin,kaprodi,dosen)
+      
+      Tabel: kontrak_kuliah
+      Kolom: id, kelas_id (unique), jadwal_ruang, jadwal_hari, jadwal_jam,
+             klausa, ttd, tgl_ttd
+
+   d. PESERTA KELAS
+      ✓ Add/remove mahasiswa dari kelas (KelasController::addPeserta, 
+        ::deletePeserta)
+      ✓ Filter mahasiswa eligible: hanya dari prodi yang sama dengan mata kuliah
+      ✓ Manage: dosen pengampu, kaprodi, admin
+      
+      Route:
+      - POST /kelas/{id}/peserta/add (filter: role:admin,kaprodi,dosen)
+      - POST /kelas/{id}/peserta/delete/{peserta_id} (filter: role:admin,
+        kaprodi,dosen)
+      
+      Tabel: peserta_kelas
+      Kolom: id, kelas_id, mahasiswa_id
+
+   e. VISIBILITAS KELAS
+      ✓ Dosen: hanya kelas yang dia ampu (ada di kelas_dosen)
+      ✓ Admin, kaprodi, GKM, GPM: semua kelas
+      ✓ Validasi di Access::canViewKelas(), Access::canManageKelas()
+
+
+6. PRESENSI & NILAI
+────────────────────────────────────────────────────────────────────────────
+   ✓ Controller: PresensiController (4 method)
+   ✓ Model: PresensiModel, NilaiModel
+
+   a. PRESENSI
+      ✓ Input per kelas, per pertemuan (1-16)
+      ✓ Status per mahasiswa: H (Hadir), I (Izin), S (Sakit), A (Alfa)
+      ✓ Batch save presensi (PresensiController::simpanPresensi)
+      ✓ Access: dosen pengampu, kaprodi, admin
+      
+      Route:
+      - GET  /presensi (filter: role:admin,kaprodi,dosen)
+      - GET  /presensi/{kelas_id} (filter: role:admin,kaprodi,dosen)
+      - POST /presensi/{kelas_id}/simpan (filter: role:admin,kaprodi,dosen)
+      
+      Tabel: presensi
+      Kolom: id, peserta_id, pertemuan (1-16), status
+
+   b. NILAI
+      ✓ Input per kelas, per jenis penilaian
+      ✓ Nilai numerik (0-100)
+      ✓ Batch save nilai (PresensiController::simpanNilai)
+      ✓ Access: dosen pengampu, kaprodi, admin
+      
+      Route:
+      - POST /presensi/{kelas_id}/nilai (filter: role:admin,kaprodi,dosen)
+      
+      Tabel: nilai
+      Kolom: id, peserta_id, jenis_penilaian_id, nilai
+
+
+7. LAPORAN & ANALISIS OBE
+────────────────────────────────────────────────────────────────────────────
+   ✓ Controller: CapaianController, PortofolioController
+
+   a. CAPAIAN CPMK & CPL
+      ✓ Laporan per kelas (CapaianController::show)
+      ✓ Hitung capaian CPMK otomatis dari nilai × matriks penilaian
+      ✓ Method: CapaianController::hitung() - shared dengan portofolio
+      
+      Kalkulasi:
+      - Nilai per CPMK = weighted average dari semua jenis penilaian yang 
+        berkontribusi ke CPMK tersebut (via matriks_penilaian)
+      - Skala rubrik: ≥80 = Sangat Baik, ≥65 = Baik, ≥50 = Cukup, <50 = Kurang
+      - Lulus CPMK: nilai ≥ 65
+      - Nilai akhir mahasiswa = weighted average dari semua jenis penilaian
+      - Konversi huruf: A (≥85), A- (≥80), B+ (≥75), B (≥70), B- (≥65), 
+        C+ (≥60), C (≥55), D (≥40), E (<40)
+      - Rekap presensi: H/I/S/A count + skor kehadiran (%)
+      - Eligible: skor kehadiran ≥ 75%
+      
+      Helper functions di obe_helper.php:
+      - rekap_presensi()
+      - nilai_akhir()
+      - capaian_cpmk()
+      - nilai_huruf()
+      - skala_rubrik()
+      
+      Route:
+      - GET /capaian (filter: auth)
+      - GET /capaian/{kelas_id} (filter: auth, validasi kepemilikan)
+      
+      Output:
+      - Tabel per mahasiswa: NIM, nama, presensi, nilai akhir, nilai per CPMK
+      - Summary per CPMK: total mahasiswa, count per skala (SB/B/C/K), 
+        persentase lulus
+
+   b. PORTOFOLIO KELAS
+      ✓ Narasi per kelas (PortofolioController)
+      ✓ Update: tujuan, metode, isi (PortofolioController::updateNarasi)
+      ✓ Reuse data capaian dari CapaianController::hitung()
+      ✓ Access: dosen pengampu, kaprodi, admin (update)
+      ✓ View: semua role yang bisa lihat kelas
+      
+      Route:
+      - GET  /portofolio (filter: auth)
+      - GET  /portofolio/{kelas_id} (filter: auth)
+      - POST /portofolio/{kelas_id}/narasi (filter: role:admin,kaprodi,dosen)
+      
+      Tabel: portofolio
+      Kolom: id, kelas_id (unique), tujuan, metode, isi
+
+
+8. DASHBOARD
+────────────────────────────────────────────────────────────────────────────
+   ✓ Controller: Dashboard::index
+   ✓ Route: GET / (filter: auth)
+   ✓ View: dashboard.php
+   ✓ Konten disesuaikan per role (tidak ada query khusus di controller, 
+     diserahkan ke view)
+
+
+9. LANDING PAGE PUBLIK
+────────────────────────────────────────────────────────────────────────────
+   ✓ Controller: Home::index
+   ✓ Route: GET /login (halaman landing sebelum login)
+   ✓ View: welcome_message.php
+   ✓ Tidak perlu autentikasi
+
+
+10. HELPER & LIBRARY PENDUKUNG
+────────────────────────────────────────────────────────────────────────────
+   a. LIBRARY ACCESS (App\Libraries\Access)
+      ✓ Centralized authorization logic
+      ✓ Method:
+        - role(): string|null
+        - dosenId(): int|null
+        - is(string ...$roles): bool
+        - userName(): string
+        - actorLabel(): string  (format: "Nama (ROLE)")
+        - canViewRps(array $rps): bool
+        - canEditRps(array $rps): bool
+        - canSignAsDosen(array $rps): bool
+        - canSignAsKaprodi(array $rps): bool
+        - visibleRps(): array
+        - isPengampu(int $kelasId): bool
+        - canViewKelas(int $kelasId): bool
+        - canWriteKelasData(int $kelasId): bool
+        - canManageKelas(int $kelasId): bool
+        - visibleKelas(): array
+
+   b. HELPER auth_helper.php
+      ✓ has_role(string ...$roles): bool
+      ✓ Shortcut untuk cek role di view
+
+   c. HELPER obe_helper.php
+      ✓ status_label(string $status): string
+      ✓ status_badge(string $status): string
+      ✓ tanggal_id(?string $datetime): string
+      ✓ gabung_teks(array $bagian, string $pemisah): string
+      ✓ nilai_huruf(float $n): string
+      ✓ skala_rubrik(float $n): string
+      ✓ skala_class(string $s): string
+      ✓ rekap_presensi(array $presensiRows, int $jumlahPertemuan): array
+      ✓ nilai_akhir(array $nilaiByJenisId, array $jenisList): array
+      ✓ capaian_cpmk(array $nilaiByJenisId, array $cpmkList, 
+                     array $matriksRows): array
+
+
+11. VIEWS (TAMPILAN)
+────────────────────────────────────────────────────────────────────────────
+   ✓ Struktur folder views:
+     - auth/           (login, password)
+     - capaian/        (pilih, show)
+     - errors/         (html/)
+     - kelas/          (index, detail)
+     - kurikulum/      (index)
+     - layout/         (shared layout components)
+     - master/         (prodi, dosen, mahasiswa, matakuliah)
+     - portofolio/     (index, show)
+     - presensi/       (index, show)
+     - rps/            (index, detail)
+     - users/          (index)
+     - dashboard.php
+     - welcome_message.php
+
+   ✓ Design system: Sky blue gradient + Amber action (lihat DESIGN.md)
+
+
+================================================================================
+B. FITUR YANG DISEBUT TETAPI BELUM TERVERIFIKASI PENUH
+================================================================================
+
+1. KALKULASI OTOMATIS NILAI AKHIR
+   ❓ Helper nilai_akhir() dan capaian_cpmk() ADA di obe_helper.php
+   ❓ Digunakan di CapaianController dan PortofolioController
+   ✓ VERIFIKASI: Kalkulasi otomatis SUDAH DIIMPLEMENTASI melalui helper
+   
+   Catatan: Kalkulasi dilakukan on-the-fly saat tampilan laporan, bukan 
+   disimpan di tabel terpisah.
+
+
+2. TTD DIGITAL
+   ❓ Kolom ttd_dosen, ttd_kaprodi di tabel rps (TINYINT 0/1)
+   ❓ Kolom ttd di tabel kontrak_kuliah (TINYINT 0/1)
+   ❓ Tidak ada kolom untuk menyimpan file signature atau hash
+   ❓ Tidak ada integrasi dengan library TTD digital (e.g., e-Sign)
+   
+   Catatan: Yang ada hanya FLAG boolean dan tanggal tanda tangan. Bukan TTD 
+   digital dalam arti kriptografi atau file gambar tanda tangan.
+
+
+3. IMPORT/EXPORT DATA
+   ❓ Tidak ditemukan controller, route, atau method untuk import/export
+   ❓ Tidak ada library CSV, Excel, atau PDF di controller
+   
+   Catatan: Jika ada, kemungkinan belum diimplementasi atau ada di branch lain.
+
+
+4. AUDIT TRAIL
+   ❓ Yang tercatat: rps_status_log untuk workflow RPS
+   ✓ TIDAK ADA: log untuk CRUD master data, perubahan nilai, perubahan peserta
+   
+   Catatan: Audit trail hanya untuk alur persetujuan RPS, bukan untuk seluruh 
+   aksi penting di sistem.
+
+
+5. KEAMANAN (CSRF, ANTI-XSS)
+   ✓ CSRF protection: bawaan CodeIgniter 4 (jika diaktifkan di Config)
+   ✓ XSS filtering: bawaan CodeIgniter 4
+   ❓ Tidak ada kode eksplisit di controller untuk validasi tambahan
+   
+   Catatan: Keamanan bergantung pada fitur framework. Tidak ada bukti custom 
+   security layer di kode.
+
+
+6. SOFT DELETE
+   ❓ Tidak ada kolom deleted_at di tabel manapun
+   ❓ Semua delete adalah hard delete
+   
+   Catatan: Tidak diimplementasi.
+
+
+7. KOLOM updated_at
+   ❓ Hanya ada created_at di tabel rps dan users
+   ❓ Tidak ada updated_at di tabel manapun
+   
+   Catatan: Tidak diimplementasi.
+
+
+8. INDEKS DATABASE TAMBAHAN
+   ❓ Index yang ada: primary key, foreign key, unique (nim di mahasiswa, 
+     kelas_id di kontrak_kuliah dan portofolio)
+   ❓ Tidak ada index pada kolom pencarian seperti status, role, tahun_akademik
+   
+   Catatan: Bisa ditambahkan untuk optimasi query.
+
+
+9. API TERPISAH
+   ❓ Tidak ada API controller (RESTful)
+   ❓ Semua endpoint return view HTML, bukan JSON
+   
+   Catatan: Tidak ada API layer untuk konsumsi eksternal atau mobile app.
+
+
+================================================================================
+C. FITUR YANG BELUM ADA (BERDASARKAN DOKUMENTASI)
+================================================================================
+
+1. ❌ API RESTful untuk integrasi eksternal
+2. ❌ Soft delete dengan kolom deleted_at
+3. ❌ Kolom updated_at untuk audit perubahan data
+4. ❌ Indeks database tambahan untuk optimasi query
+5. ❌ Import/export data (CSV, Excel)
+6. ❌ TTD digital kriptografis (hanya flag boolean)
+7. ❌ Audit trail lengkap untuk semua aksi CRUD
+8. ❌ Notifikasi email/push untuk workflow RPS
+9. ❌ Upload file dokumen pendukung RPS
+10. ❌ Grafik/chart visual di dashboard
+11. ❌ Filter & pencarian advanced di list view
+12. ❌ Pagination di tabel data (jika data banyak)
+13. ❌ Multi-language support
+14. ❌ Dark mode theme
+
+
+================================================================================
+D. STRUKTUR DATABASE
+================================================================================
+
+Total: 17 tabel
+
+1.  prodi (id, nama, jurusan, fakultas)
+2.  cpl (id, prodi_id, kode, deskripsi)
+3.  dosen (id, nama, nidn)
+4.  mahasiswa (id, nim UNIQUE, nama, prodi_id)
+5.  mata_kuliah (id, kode, nama, tingkat_mk, prodi_id, rumpun_mk, sifat_mk, 
+                 sks, semester, deskripsi)
+6.  cpmk (id, mk_id, kode, deskripsi)
+7.  cpmk_cpl (id, cpmk_id, cpl_id, bobot)
+8.  rps (id, mk_id, tahun_akademik, pengembang_id, koor_prodi_id, status, 
+         ttd_dosen, ttd_kaprodi, arsip_gpm, arsip_lokasi, created_at)
+9.  rps_pertemuan (id, rps_id, minggu, sub_cpmk, indikator, materi, model, 
+                   bentuk, bobot, is_uts, is_uas)
+10. jenis_penilaian (id, rps_id, nama, bobot)
+11. matriks_penilaian (id, rps_id, jenis_penilaian_id, cpmk_id, bobot)
+12. rps_status_log (id, rps_id, status, catatan, oleh, tanggal)
+13. kelas (id, mk_id, rps_id, label, semester, tahun_akademik, jumlah_pertemuan)
+14. kelas_dosen (id, kelas_id, dosen_id)
+15. kontrak_kuliah (id, kelas_id UNIQUE, jadwal_ruang, jadwal_hari, jadwal_jam, 
+                    klausa, ttd, tgl_ttd)
+16. peserta_kelas (id, kelas_id, mahasiswa_id)
+17. presensi (id, peserta_id, pertemuan, status)
+18. nilai (id, peserta_id, jenis_penilaian_id, nilai)
+19. portofolio (id, kelas_id UNIQUE, tujuan, metode, isi)
+20. users (id, username, password, nama, role, aktif, dosen_id, created_at)
+
+Relasi CASCADE:
+- cpl → prodi
+- cpmk → mata_kuliah
+- cpmk_cpl → cpmk, cpl
+- rps → mata_kuliah
+- rps_pertemuan, jenis_penilaian, matriks_penilaian, rps_status_log → rps
+- kelas → mata_kuliah, rps
+- kelas_dosen → kelas, dosen
+- kontrak_kuliah, peserta_kelas, portofolio → kelas
+- presensi, nilai → peserta_kelas
+- matriks_penilaian → jenis_penilaian, cpmk
+
+Relasi SET NULL:
+- mahasiswa → prodi
+- mata_kuliah → prodi
+
+
+================================================================================
+E. HAK AKSES PER ROLE
+================================================================================
+
+ADMIN
+─────
+✓ Full CRUD: users, prodi, dosen, mahasiswa, mata kuliah
+✓ Full access: CPL, CPMK, matriks CPMK-CPL
+✓ Lihat semua RPS, bisa edit semua RPS
+✓ Lihat & kelola semua kelas
+✓ Input presensi & nilai untuk semua kelas
+✓ Lihat semua laporan capaian & portofolio
+
+DOSEN
+─────
+✓ Ganti password sendiri
+✓ Buat RPS (otomatis jadi pengembang)
+✓ Edit & ajukan RPS yang dia kembangkan
+✓ TTD dosen untuk RPS yang dia kembangkan
+✓ Lihat & kelola kelas yang dia ampu
+✓ Update kontrak kuliah
+✓ Add/remove peserta
+✓ Input presensi & nilai untuk kelas yang dia ampu
+✓ Lihat laporan capaian & portofolio kelas yang dia ampu
+✓ Update narasi portofolio kelas yang dia ampu
+
+GKM (Gugus Kendali Mutu)
+────────────────────────
+✓ Ganti password sendiri
+✓ Lihat RPS yang sudah diajukan (status != draft)
+✓ Review RPS: setuju atau minta revisi
+✓ Lihat semua kelas
+✓ Lihat semua laporan capaian & portofolio
+❌ Tidak bisa edit data master, input nilai, atau kelola kelas
+
+KAPRODI (Koordinator Prodi)
+────────────────────────────
+✓ Ganti password sendiri
+✓ CRUD: mata kuliah (create & delete)
+✓ Read: prodi, dosen, mahasiswa
+✓ CRUD: CPL, CPMK, matriks CPMK-CPL
+✓ Lihat semua RPS
+✓ TTD kaprodi untuk RPS yang ditetapkan ke dia (koor_prodi_id)
+✓ Create & kelola semua kelas
+✓ Input presensi & nilai untuk semua kelas
+✓ Lihat & update semua laporan capaian & portofolio
+✓ Arsip RPS
+
+GPM (Gugus Penjaminan Mutu)
+────────────────────────────
+✓ Ganti password sendiri
+✓ Lihat RPS yang sudah diajukan (status != draft)
+✓ Arsip RPS
+✓ Lihat semua kelas
+✓ Lihat semua laporan capaian & portofolio
+❌ Tidak bisa edit data master, review RPS, atau kelola kelas
+
+
+================================================================================
+F. ALUR BISNIS UTAMA
+================================================================================
+
+1. SETUP AWAL (Admin)
+   1.1. Buat akun users untuk semua role
+   1.2. Input data prodi
+   1.3. Input data dosen
+   1.4. Input data mahasiswa
+   1.4. Buat CPL per prodi
+
+2. PERANCANGAN KURIKULUM (Admin/Kaprodi)
+   2.1. Buat mata kuliah
+   2.2. Buat CPMK per mata kuliah
+   2.3. Set bobot CPMK → CPL (matriks)
+
+3. PENYUSUNAN RPS (Dosen)
+   3.1. Dosen login
+   3.2. Buat draf RPS
+   3.3. Isi 16 pertemuan
+   3.4. (Opsional) Tambah/hapus jenis penilaian
+   3.5. Update bobot jenis penilaian (total = 100%)
+   3.6. Isi matriks penilaian × CPMK
+   3.7. Ajukan RPS ke GKM
+
+4. REVIEW RPS (GKM)
+   4.1. GKM login
+   4.2. Lihat RPS yang diajukan
+   4.3. Pilih: Setuju atau Revisi
+   4.4. (Jika revisi) Isi catatan revisi → dosen edit lagi → ajukan ulang
+   4.5. (Jika setuju) Status jadi "disetujui_gkm"
+
+5. PENANDATANGANAN RPS (Dosen & Kaprodi)
+   5.1. Dosen TTD
+   5.2. Kaprodi TTD
+   5.3. Status otomatis → "ditandatangani"
+
+6. ARSIP RPS (GPM/Kaprodi)
+   6.1. Input lokasi arsip fisik (opsional)
+   6.2. Tandai sebagai "diarsipkan"
+
+7. BUKA KELAS (Admin/Kaprodi)
+   7.1. Pilih RPS yang sudah diarsipkan
+   7.2. Buat kelas dengan label (misal "A", "B")
+   7.3. Pilih dosen pengampu (bisa multiple - team teaching)
+   7.4. Auto-generate kontrak kuliah kosong
+   7.5. Auto-generate portofolio kosong
+
+8. SETUP KELAS (Dosen/Admin/Kaprodi)
+   8.1. Update kontrak kuliah (jadwal, klausa, TTD)
+   8.2. Tambah peserta kelas (mahasiswa)
+
+9. PELAKSANAAN PERKULIAHAN (Dosen)
+   9.1. Input presensi per pertemuan (H/I/S/A)
+   9.2. Input nilai per jenis penilaian
+
+10. LAPORAN & ANALISIS (Semua Role)
+    10.1. Lihat capaian CPMK per kelas
+    10.2. Lihat nilai akhir mahasiswa
+    10.3. Lihat rekap presensi
+    10.4. (Dosen) Update narasi portofolio kelas
+
+
+================================================================================
+G. TEKNOLOGI & DEPENDENCIES
+================================================================================
+
+Framework: CodeIgniter 4
+- PHP ≥ 7.4 (recommended 8.0+)
+- Database: MySQL 5.7+ / MariaDB 10.3+
+- Web server: Apache / Nginx
+- Composer untuk dependency management
+
+Library Bawaan CodeIgniter 4 yang Digunakan:
+- Database Query Builder
+- Validation
+- Session
+- Filters (Auth & Role)
+- Routing
+- View
+
+Custom Components:
+- App\Libraries\Access (authorization)
+- App\Helpers\auth_helper.php
+- App\Helpers\obe_helper.php
+- App\Filters\AuthFilter
+- App\Filters\RoleFilter
+
+
+================================================================================
+H. CATATAN PENTING
+================================================================================
+
+1. KEAMANAN
+   - Password di-hash dengan password_hash() (bcrypt)
+   - Session-based authentication (bukan JWT)
+   - CSRF protection bergantung pada Config\Security
+   - XSS filtering bergantung pada esc() di view
+   - Tidak ada rate limiting untuk login
+   - Tidak ada password complexity requirement di controller
+
+2. VALIDASI
+   - Validasi bobot penilaian = 100% sebelum ajukan RPS
+   - Validasi kepemilikan data di Access library
+   - Tidak ada validasi file upload (karena tidak ada fitur upload)
+
+3. PERFORMA
+   - Tidak ada caching
+   - Tidak ada pagination (data dimuat semua)
+   - Query banyak menggunakan findAll() tanpa limit
+   - Bisa lambat jika data sudah ribuan baris
+
+4. DEPLOYMENT
+   - Sesuaikan base_url di Config\App.php
+   - Set environment production di .env
+   - Jalankan migration: php spark migrate
+   - Jalankan seeder: php spark db:seed UserSeeder
+   - Set permission writable/cache dan writable/logs
+
+5. DOKUMENTASI
+   - Tidak ada API documentation (karena tidak ada API)
+   - Dokumentasi inline minimal di controller
+   - Tidak ada user manual
+
+6. TESTING
+   - Tidak ada unit test
+   - Tidak ada integration test
+   - Tidak ada test coverage
+
+
+================================================================================
+I. ROADMAP FITUR YANG BISA DITAMBAHKAN
+================================================================================
+
+PRIORITAS TINGGI
+1. Pagination di semua list view
+2. Filter & pencarian di list (misal: cari RPS per status, per mata kuliah)
+3. Export laporan capaian ke PDF/Excel
+4. Grafik visual di dashboard (chart.js / apex charts)
+5. Upload file dokumen pendukung RPS (silabus, bahan ajar)
+6. Notifikasi email saat RPS diajukan/disetujui/revisi
+
+PRIORITAS MENENGAH
+7. Soft delete dengan restore functionality
+8. Audit trail lengkap (log semua aksi CRUD)
+9. Password complexity requirement & expiry
+10. Session timeout & auto-logout
+11. Backup & restore database dari UI
+12. Import mahasiswa & dosen dari CSV/Excel
+
+PRIORITAS RENDAH
+13. RESTful API untuk mobile app
+14. Multi-language support (ID/EN)
+15. Dark mode theme
+16. Print preview untuk RPS & kontrak kuliah
+17. Integrasi dengan SIAKAD eksternal (API)
+18. Role permission yang lebih granular (ACL)
+
+
+================================================================================
+AKHIR DOKUMEN
+================================================================================
+Dokumen ini dibuat secara otomatis berdasarkan analisis kode sumber SIRENCANA.
+Untuk pertanyaan atau klarifikasi, hubungi tim developer.
+
+Generated: 27 Oktober 2026

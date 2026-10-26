@@ -4,13 +4,43 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= esc($title ?? 'Masuk') ?> — SIRENCANA</title>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= base_url('assets/style.css') ?>">
 <style>
-  .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--navy)}
-  .auth-card{width:100%;max-width:400px;background:var(--paper-raised);border-radius:var(--radius);padding:32px 30px}
-  .auth-card h1{font-size:1.6rem;margin-bottom:2px}
-  .auth-card .sub{color:var(--ink-soft);font-size:.82rem;margin-bottom:22px}
+  .auth-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(135deg, var(--color-sky-blue) 0%, var(--color-sky-600) 100%);
+  }
+  
+  .auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--color-pure-white);
+    border-radius: var(--radius-card);
+    padding: 40px 36px;
+    box-shadow: 0 20px 60px rgba(30, 41, 59, 0.25);
+  }
+  
+  .auth-card h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.56px;
+    color: var(--color-deep-ink);
+    margin-bottom: 6px;
+  }
+  
+  .auth-card .sub {
+    color: var(--color-soft-ink);
+    font-size: 14px;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
 </style>
 </head>
 <body>

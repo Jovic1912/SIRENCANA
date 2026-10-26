@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIRENCANA Design System Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    body {
+      padding: 48px;
+      background: #fafafa;
+    }
+    .preview-section {
+      background: white;
+      padding: 32px;
+      margin-bottom: 24px;
+      border-radius: 16px;
+      border: 1.5px solid #e2e8f0;
+    }
+    .preview-section h2 {
+      margin-top: 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #3b82f6;
+      color: #1e293b;
+    }
+    .preview-grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .preview-item {
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    .preview-item h4 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .color-swatch {
+      display: inline-block;
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      margin-right: 12px;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .color-info {
+      display: inline-block;
+      vertical-align: top;
+      padding-top: 8px;
+    }
+    .color-name {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+    .color-hex {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <div class="preview-section">
+      <h1 style="margin: 0; color: #3b82f6; font-size: 40px; letter-spacing: -0.8px;">SIRENCANA Design System</h1>
+      <p style="color: #64748b; margin: 8px 0 0 0; font-size: 16px;">Visual reference untuk semua komponen design system</p>
+    </div>
+
+    <!-- Colors -->
+    <div class="preview-section">
+      <h2>🎨 Colors</h2>
+      
+      <h3 style="margin-top: 24px; margin-bottom: 16px; color: #1e293b;">Primary Colors</h3>
+      <div class="preview-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        <div class="preview-item">
+          <span class="color-swatch" style="background: #3b82f6;"></span>
+          <div class="color-info">
+            <div class="color-name">Sky Blue</div>
+            <div class="color-hex">#3b82f6</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Primary, Sidebar</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="color-swatch" style="background: #2563eb;"></span>
+          <div class="color-info">
+            <div class="color-name">Sky 600</div>
+            <div class="color-hex">#2563eb</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Gradient, Hover</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="color-swatch" style="background: #f59e0b;"></span>
+          <div class="color-info">
+            <div class="color-name">Amber Action</div>
+            <div class="color-hex">#f59e0b</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Buttons</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 32px; margin-bottom: 16px; color: #1e293b;">Status Colors</h3>
+      <div class="preview-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="preview-item">
+          <span class="color-swatch" style="background: #10b981;"></span>
+          <div class="color-info">
+            <div class="color-name">Success</div>
+            <div class="color-hex">#10b981</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="color-swatch" style="background: #f97316;"></span>
+          <div class="color-info">
+            <div class="color-name">Warning</div>
+            <div class="color-hex">#f97316</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="color-swatch" style="background: #ef4444;"></span>
+          <div class="color-info">
+            <div class="color-name">Error</div>
+            <div class="color-hex">#ef4444</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typography -->
+    <div class="preview-section">
+      <h2>📝 Typography</h2>
+      <div style="margin-top: 20px;">
+        <div style="margin-bottom: 24px;">
+          <h1 style="margin: 0;">Display Heading (28px / 700)</h1>
+          <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0;">Font: Inter, Letter-spacing: -0.56px</p>
+        </div>
+        <div style="margin-bottom: 24px;">
+          <h2 style="margin: 0;">Heading Level 2 (22px / 600)</h2>
+          <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0;">Letter-spacing: -0.22px</p>
+        </div>
+        <div style="margin-bottom: 24px;">
+          <h3 style="margin: 0;">Heading Level 3 (18px / 600)</h3>
+          <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0;">Default spacing</p>
+        </div>
+        <div style="margin-bottom: 24px;">
+          <p style="margin: 0; font-size: 15px;">Body text paragraph (15px / 400). Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+          <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0;">Line-height: 1.6</p>
+        </div>
+        <div style="margin-bottom: 24px;">
+          <p style="margin: 0; font-size: 13px; color: #64748b;">Secondary text / labels (13px / 500)</p>
+        </div>
+        <div>
+          <code class="mono" style="background: #f8fafc; padding: 4px 8px; border-radius: 4px; font-size: 14px;">Monospace code (IBM Plex Mono)</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="preview-section">
+      <h2>🔘 Buttons</h2>
+      <div class="preview-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+        <div class="preview-item">
+          <h4>Primary Button</h4>
+          <button class="btn">Primary Action</button>
+          <button class="btn sm">Small Button</button>
+        </div>
+        <div class="preview-item">
+          <h4>Ghost/Outline Button</h4>
+          <button class="btn ghost">Secondary Action</button>
+          <button class="btn ghost sm">Small Ghost</button>
+        </div>
+        <div class="preview-item">
+          <h4>Button Variants</h4>
+          <button class="btn teal">Teal Button</button>
+          <button class="btn amber">Amber Button</button>
+          <button class="btn red">Red Button</button>
+        </div>
+        <div class="preview-item">
+          <h4>Disabled State</h4>
+          <button class="btn" disabled>Disabled Button</button>
+          <button class="btn ghost" disabled>Disabled Ghost</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Forms -->
+    <div class="preview-section">
+      <h2>📋 Form Elements</h2>
+      <div style="max-width: 600px;">
+        <div class="field">
+          <label>Text Input</label>
+          <input type="text" placeholder="Masukkan teks...">
+        </div>
+        <div class="field">
+          <label>Select Dropdown</label>
+          <select>
+            <option>Pilih opsi...</option>
+            <option>Opsi 1</option>
+            <option>Opsi 2</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Textarea</label>
+          <textarea placeholder="Masukkan teks panjang..."></textarea>
+        </div>
+        <div class="field">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" style="width: auto;">
+            <span>Checkbox Label</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 8px;">
+            <input type="radio" name="radio-demo" style="width: auto;">
+            <span>Radio Button 1</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 8px;">
+            <input type="radio" name="radio-demo" style="width: auto;">
+            <span>Radio Button 2</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="preview-section">
+      <h2>🏷️ Badges</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px;">
+        <span class="badge draft">Draft</span>
+        <span class="badge diajukan">Diajukan</span>
+        <span class="badge diperiksa">Diperiksa</span>
+        <span class="badge revisi_diperlukan">Revisi Diperlukan</span>
+        <span class="badge disetujui_gkm">Disetujui GKM</span>
+        <span class="badge ditandatangani">Ditandatangani</span>
+        <span class="badge diarsipkan">Diarsipkan</span>
+        <span class="badge kurang">Kurang</span>
+        <span class="badge cukup">Cukup</span>
+        <span class="badge baik">Baik</span>
+        <span class="badge sangatbaik">Sangat Baik</span>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="preview-section">
+      <h2>⚠️ Alerts</h2>
+      <div class="alert success">Operasi berhasil! Data telah disimpan ke database.</div>
+      <div class="alert error">Terjadi kesalahan! Silakan coba lagi atau hubungi administrator.</div>
+    </div>
+
+    <!-- Cards & Panels -->
+    <div class="preview-section">
+      <h2>📦 Cards & Panels</h2>
+      <div class="panel">
+        <h2>Panel Title</h2>
+        <p>Panel content goes here. Ini adalah contoh panel dengan border dan radius yang sesuai design system.</p>
+        <button class="btn sm">Action Button</button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="preview-section">
+      <h2>📊 Stat Cards</h2>
+      <div class="grid-stats">
+        <div class="stat">
+          <div class="n">42</div>
+          <div class="l">Total Mahasiswa</div>
+        </div>
+        <div class="stat">
+          <div class="n">12</div>
+          <div class="l">Mata Kuliah Aktif</div>
+        </div>
+        <div class="stat">
+          <div class="n">8</div>
+          <div class="l">Kelas Berjalan</div>
+        </div>
+        <div class="stat">
+          <div class="n">156</div>
+          <div class="l">Dokumen RPS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="preview-section">
+      <h2>📋 Table</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>NIM</th>
+              <th>Nama Mahasiswa</th>
+              <th>Program Studi</th>
+              <th class="num">SKS</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">1234567890</td>
+              <td>John Doe</td>
+              <td>Informatika</td>
+              <td class="num">21</td>
+              <td><a href="#" class="link">Detail →</a></td>
+            </tr>
+            <tr>
+              <td class="mono">9876543210</td>
+              <td>Jane Smith</td>
+              <td>Sistem Informasi</td>
+              <td class="num">18</td>
+              <td><a href="#" class="link">Detail →</a></td>
+            </tr>
+            <tr>
+              <td class="mono">5555555555</td>
+              <td>Bob Johnson</td>
+              <td>Teknik Komputer</td>
+              <td class="num">20</td>
+              <td><a href="#" class="link">Detail →</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="preview-section">
+      <h2>🔗 Links & Actions</h2>
+      <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+        <a href="#" class="link">Standard Link →</a>
+        <button class="link">Button as Link</button>
+        <button class="iconbtn">Delete Action</button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="preview-section">
+      <h2>📭 Empty State</h2>
+      <div class="empty">Tidak ada data untuk ditampilkan saat ini.</div>
+    </div>
+
+    <!-- Utility Classes -->
+    <div class="preview-section">
+      <h2>🛠️ Utility Classes</h2>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <span class="text-primary">Primary Color Text</span> · 
+          <span class="text-success">Success Text</span> · 
+          <span class="text-warning">Warning Text</span> · 
+          <span class="text-error">Error Text</span> · 
+          <span class="text-muted">Muted Text</span>
+        </div>
+        <div>
+          <span class="font-normal">Normal Weight</span> · 
+          <span class="font-medium">Medium Weight</span> · 
+          <span class="font-semibold">Semibold Weight</span> · 
+          <span class="font-bold">Bold Weight</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="badge draft">Flex</span>
+          <span class="badge diajukan">Items</span>
+          <span class="badge disetujui_gkm">Center</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spacing Reference -->
+    <div class="preview-section">
+      <h2>📏 Spacing Scale</h2>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="width: 100px; color: #64748b;">spacing-1</span>
+          <div style="width: 4px; height: 20px; background: #3b82f6; border-radius: 2px;"></div>
+          <span>4px</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="width: 100px; color: #64748b;">spacing-2</span>
+          <div style="width: 8px; height: 20px; background: #3b82f6; border-radius: 2px;"></div>
+          <span>8px</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="width: 100px; color: #64748b;">spacing-3</span>
+          <div style="width: 12px; height: 20px; background: #3b82f6; border-radius: 2px;"></div>
+          <span>12px</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="width: 100px; color: #64748b;">spacing-4</span>
+          <div style="width: 16px; height: 20px; background: #3b82f6; border-radius: 2px;"></div>
+          <span>16px</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="width: 100px; color: #64748b;">spacing-6</span>
+          <div style="width: 24px; height: 20px; background: #3b82f6; border-radius: 2px;"></div>
+          <span>24px</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="width: 100px; color: #64748b;">spacing-8</span>
+          <div style="width: 32px; height: 20px; background: #3b82f6; border-radius: 2px;"></div>
+          <span>32px</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="preview-section" style="text-align: center; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none;">
+      <h2 style="color: white; border: none; padding-bottom: 0;">SIRENCANA Design System</h2>
+      <p style="opacity: 0.9; margin: 12px 0 0 0;">Version 1.0.0 • Based on Perk design philosophy</p>
+      <p style="opacity: 0.8; margin: 8px 0 0 0; font-size: 13px;">
+        <a href="../DESIGN.md" style="color: #fbbf24; text-decoration: none; font-weight: 600;">📚 Documentation</a> · 
+        <a href="../QUICK_START_DESIGN.md" style="color: #fbbf24; text-decoration: none; font-weight: 600;">🚀 Quick Start</a> · 
+        <a href="../TESTING_DESIGN.md" style="color: #fbbf24; text-decoration: none; font-weight: 600;">🧪 Testing Guide</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Add hover states demo
+    console.log('%c🎨 SIRENCANA Design System Preview', 'font-size: 20px; color: #3b82f6; font-weight: bold;');
+    console.log('%cInteract with components to see hover and focus states!', 'color: #64748b;');
+  </script>
+</body>
+</html>
