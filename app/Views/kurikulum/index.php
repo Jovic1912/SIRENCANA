@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 
 <div class="pagehead"><div><h1>Kurikulum &amp; CPMK</h1><p>Susun CPL prodi, pilih Mata Kuliah, lalu kelola CPMK dan matriks pembebanan CPMK → CPL.</p></div></div>

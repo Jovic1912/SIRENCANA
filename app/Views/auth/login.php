@@ -1,8 +1,8 @@
-<?= $this->extend('layout/auth') ?>
+<?= $this->extend('layout/auth_tailwind') ?>
 <?= $this->section('content') ?>
 
 <!-- Login Form -->
-<form method="post" action="<?= site_url('login') ?>" autocomplete="off" class="space-y-5">
+<form method="post" action="<?= site_url('login') ?>" autocomplete="off" class="space-y-6">
   <?= csrf_field() ?>
   
   <!-- Username Field -->
@@ -27,16 +27,16 @@
            class="form-input">
   </div>
   
-  <!-- Submit Button dengan warna kuning gelap -->
-  <button type="submit" class="w-full bg-yellow-dark hover:bg-yellow text-primary-950 font-bold py-3 rounded-md border-2 border-yellow-dark hover:border-yellow transition-all duration-200 shadow-lg hover:shadow-xl">
+  <!-- Submit Button - Amber sesuai design.md -->
+  <button type="submit" class="w-full btn-amber text-base">
     Masuk
   </button>
 </form>
 
 <!-- Footer Text -->
-<p class="text-center text-sm text-primary-600 mt-6 pt-6 border-t border-primary-200">
+<p class="text-center text-body-sm text-neutral-600 mt-8 pt-6 border-t border-sky-100">
   Belum punya akun? <br>
-  <span class="font-semibold text-primary-800">Hubungi administrator program studi Anda.</span>
+  <span class="font-medium text-neutral-950 mt-1 inline-block">Hubungi administrator program studi Anda.</span>
 </p>
 
 <?= $this->endSection() ?>

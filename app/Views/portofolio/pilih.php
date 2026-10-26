@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 
 <div class="pagehead"><div><h1>Portofolio Mata Kuliah</h1><p>Ringkasan siap-cetak: kelengkapan dokumen, narasi pelaksanaan, dan hasil capaian.</p></div></div>

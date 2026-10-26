@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 
 <!-- Login Form -->
-<form method="post" action="<?= site_url('login') ?>" autocomplete="off" class="space-y-5">
+<form method="post" action="<?= site_url('login') ?>" autocomplete="off" class="space-y-6">
   <?= csrf_field() ?>
   
   <!-- Username Field -->
@@ -27,16 +27,16 @@
            class="form-input">
   </div>
   
-  <!-- Submit Button dengan warna kuning dan border emas -->
-  <button type="submit" class="w-full btn-yellow py-3 text-base font-bold shadow-lg hover:shadow-xl transition-all duration-200">
-    🔐 Masuk
+  <!-- Submit Button - Amber sesuai design.md (filled CTA) -->
+  <button type="submit" class="w-full btn-amber text-base">
+    Masuk
   </button>
 </form>
 
 <!-- Footer Text -->
-<p class="text-center text-sm text-primary-600 mt-6 pt-6 border-t-2 border-gold-pale">
+<p class="text-center text-body-sm text-neutral-600 mt-8 pt-6 border-t border-sky-100">
   Belum punya akun? <br>
-  <span class="font-semibold text-primary-800">Hubungi administrator program studi Anda.</span>
+  <span class="font-medium text-neutral-950 mt-1 inline-block">Hubungi administrator program studi Anda.</span>
 </p>
 
 <?= $this->endSection() ?>

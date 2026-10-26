@@ -1,7 +1,7 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 
-<!-- Page Header dengan gradasi biru -->
+<!-- Page Header - sesuai design.md dengan generous spacing -->
 <div class="page-header">
   <div>
     <h1 class="page-title">Dasbor</h1>
@@ -9,8 +9,8 @@
   </div>
 </div>
 
-<!-- Grid Stats dengan border emas -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+<!-- Grid Stats - 28px radius, tonal contrast per design.md -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
   <div class="stat-card">
     <div class="stat-number"><?= $jumlahMk ?></div>
     <div class="stat-label">Mata Kuliah terdaftar</div>
@@ -31,24 +31,25 @@
     <div class="stat-label">Mahasiswa terdaftar</div>
   </div>
   
-  <div class="stat-card">
-    <div class="stat-number"><?= $statusCount['diarsipkan'] ?></div>
+  <div class="stat-card bg-gradient-to-br from-green-50 to-white border-green-200/50">
+    <div class="stat-number text-green-700"><?= $statusCount['diarsipkan'] ?></div>
     <div class="stat-label">RPS diarsipkan (sah)</div>
   </div>
   
-  <div class="stat-card">
-    <div class="stat-number"><?= $statusCount['revisi_diperlukan'] ?></div>
+  <div class="stat-card bg-gradient-to-br from-amber-50 to-white border-amber-200/50">
+    <div class="stat-number text-amber-700"><?= $statusCount['revisi_diperlukan'] ?></div>
     <div class="stat-label">RPS perlu revisi dosen</div>
   </div>
 </div>
 
-<!-- Panel Dokumen dengan border emas -->
-<div class="card mb-6">
+<!-- Panel Dokumen - card dengan 28px radius per design.md -->
+<div class="card mb-12">
   <h2 class="card-header">Dokumen menunggu tindak lanjut</h2>
   
   <?php if (empty($perluAksi)): ?>
-    <div class="text-center py-8 px-4 text-primary-600 bg-primary-50 rounded-lg border border-dashed border-yellow-dark">
-      Tidak ada dokumen yang menunggu aksi saat ini.
+    <div class="text-center py-12 px-6 bg-sky-50 rounded-inner border border-dashed border-sky-300">
+      <div class="text-4xl mb-3">✓</div>
+      <p class="text-body text-neutral-600">Tidak ada dokumen yang menunggu aksi saat ini.</p>
     </div>
   <?php else: ?>
     <div class="table-container">
@@ -64,14 +65,14 @@
         <tbody>
         <?php foreach ($perluAksi as $r): $m = $mkById[$r['mk_id']] ?? null; ?>
           <tr>
-            <td class="font-medium text-primary-900">
+            <td class="font-medium text-neutral-950">
               <?= esc(($m['kode'] ?? '—') . ' — ' . ($m['nama'] ?? '—')) ?>
             </td>
-            <td class="text-primary-700"><?= esc($r['tahun_akademik']) ?></td>
+            <td class="text-neutral-700"><?= esc($r['tahun_akademik']) ?></td>
             <td><?= status_badge($r['status']) ?></td>
             <td class="text-right">
               <a href="<?= site_url('rps/' . $r['id']) ?>" 
-                 class="inline-block px-4 py-1.5 text-sm font-semibold bg-yellow-dark hover:bg-yellow text-primary-950 rounded border border-yellow-dark transition-colors">
+                 class="inline-block btn-amber px-5 py-2 text-sm">
                 Buka
               </a>
             </td>
@@ -83,24 +84,25 @@
   <?php endif; ?>
 </div>
 
-<!-- Panel Distribusi Status -->
+<!-- Panel Distribusi Status - flat design dengan tonal separation -->
 <div class="card">
   <h2 class="card-header">Distribusi status RPS</h2>
   
-  <div class="space-y-3">
+  <div class="space-y-4">
     <?php foreach ($statusOrder as $s): 
       $pct = $jumlahRps ? round($statusCount[$s] / $jumlahRps * 100) : 0; 
     ?>
-      <div class="flex items-center gap-4">
-        <div class="w-48"><?= status_badge($s) ?></div>
+      <div class="flex items-center gap-5">
+        <div class="w-48 flex-shrink-0"><?= status_badge($s) ?></div>
         
-        <div class="flex-1 bg-primary-100 rounded-full h-2.5 overflow-hidden border border-yellow-dark">
-          <div class="h-full bg-gradient-to-r from-primary-900 to-primary-700 transition-all duration-500" 
+        <!-- Progress bar dengan sky blue gradient -->
+        <div class="flex-1 bg-sky-100 rounded-pill h-3 overflow-hidden border border-sky-200/50">
+          <div class="h-full bg-gradient-to-r from-sky-600 to-sky-500 transition-all duration-500 rounded-pill" 
                style="width: <?= $pct ?>%">
           </div>
         </div>
         
-        <div class="w-16 text-right font-mono font-bold text-primary-800">
+        <div class="w-20 text-right font-medium text-neutral-950 text-lg">
           <?= $statusCount[$s] ?>
         </div>
       </div>

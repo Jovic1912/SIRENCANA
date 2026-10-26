@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 <?php $roles = \App\Models\UserModel::ROLES; ?>
 <div class="pagehead"><div><a class="link" href="<?= site_url('users') ?>">← Kembali ke daftar pengguna</a><h1 style="margin-top:8px">Ubah Pengguna</h1><p>Username: <span class="mono"><?= esc($user['username']) ?></span> (tidak dapat diubah)</p></div></div>

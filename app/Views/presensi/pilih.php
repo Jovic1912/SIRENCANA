@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 
 <div class="pagehead"><div><h1>Presensi &amp; Nilai</h1><p>Input kehadiran per pertemuan dan nilai mentah per jenis penilaian untuk satu kelas.</p></div></div>

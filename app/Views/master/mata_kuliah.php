@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 
 <div class="pagehead"><div><h1>Mata Kuliah</h1><p>Data induk mata kuliah — kategori, sifat, bobot SKS, dan deskripsi.</p></div></div>

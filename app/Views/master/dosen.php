@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 
 <div class="pagehead"><div><h1>Dosen</h1><p>Data induk dosen — dipakai sebagai pengembang RPS, koordinator prodi, dan pengampu kelas.</p></div></div>

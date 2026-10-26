@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 
 <div class="pagehead"><div><h1>RPS &amp; Persetujuan</h1><p>Rencana Pembelajaran Semester — penyusunan, verifikasi GKM, pengesahan, dan pengarsipan.</p></div></div>

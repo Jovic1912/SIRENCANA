@@ -2,236 +2,300 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Base Styles */
+/* Import Inter font - sesuai design.md */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap');
+
+/* Custom Base Styles - mengikuti design.md */
 @layer base {
   body {
-    @apply font-sans bg-primary-50 text-primary-950;
+    @apply font-sans bg-gradient-to-br from-sky-100 via-white to-sky-50 text-neutral-950;
+    font-weight: 400; /* weight 400 untuk body sesuai design.md */
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif font-semibold text-primary-900;
+    @apply font-sans text-neutral-950;
+    font-weight: 500; /* weight 500 untuk headings sesuai design.md */
+  }
+  
+  /* Typography scale sesuai design.md */
+  h1 {
+    @apply text-heading-lg;
+  }
+  
+  h2 {
+    @apply text-heading;
+  }
+  
+  h3 {
+    @apply text-subheading;
   }
 }
 
-/* Custom Components */
+/* Custom Components - mengikuti design.md Perk */
 @layer components {
-  /* Sidebar Styles - Elegant */
+  /* Sidebar - sky blue gradient dengan no shadow (flat design sesuai design.md) */
   .sidebar {
-    @apply bg-gradient-to-b from-primary-900 to-primary-950 text-white;
+    @apply bg-gradient-to-b from-sky-600 via-sky-700 to-sky-800 text-white;
   }
   
   .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-md text-primary-200 
-           transition-all duration-200 hover:bg-primary-800 hover:text-white;
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-button text-white/80 
+           transition-all duration-200 hover:bg-white/10 hover:text-white;
+    font-weight: 400; /* sesuai design.md */
   }
   
   .sidebar-link.active {
-    @apply bg-primary-700 text-white font-semibold border-l-2 border-yellow-dark;
+    @apply bg-amber-500 text-neutral-950 font-medium border-0;
+    font-weight: 500; /* emphasis voice sesuai design.md */
+    border-radius: 28px; /* button radius dari design.md */
   }
   
-  /* Button Styles - Elegant dengan kuning gelap */
+  /* Primary Button - Amber (sesuai design.md: filled CTA) */
   .btn {
-    @apply px-4 py-2 rounded-md font-semibold transition-all duration-200 
+    @apply px-6 py-3 rounded-button font-medium transition-all duration-200 
            focus:outline-none focus:ring-2 focus:ring-offset-2;
+    font-weight: 500; /* weight 500 untuk CTA sesuai design.md */
+    border-radius: 28px; /* button radius dari design.md */
   }
   
   .btn-primary {
-    @apply bg-primary-800 text-white hover:bg-primary-700 
-           focus:ring-primary-500 border-2 border-yellow-dark;
+    @apply bg-amber-500 text-neutral-950 hover:bg-amber-400 
+           focus:ring-amber-300 border-0 shadow-sm hover:shadow-md;
+    /* Amber button - singular action signal sesuai design.md */
   }
   
-  .btn-yellow {
-    @apply bg-yellow-dark text-primary-950 hover:bg-yellow 
-           focus:ring-yellow border-2 border-yellow-dark hover:border-yellow;
-  }
-  
-  .btn-gold {
-    @apply bg-yellow-dark text-primary-950 hover:bg-yellow 
-           focus:ring-yellow border-2 border-yellow-dark;
+  .btn-amber {
+    @apply bg-amber-500 text-neutral-950 hover:bg-amber-400 
+           focus:ring-amber-300 border-0 shadow-sm hover:shadow-md;
   }
   
   .btn-outline {
-    @apply bg-transparent text-primary-800 border-2 border-yellow-dark 
-           hover:bg-yellow-dark hover:text-white focus:ring-yellow-dark;
+    @apply bg-transparent text-sky-800 border-2 border-sky-300 
+           hover:bg-sky-50 hover:border-sky-400 focus:ring-sky-300;
+    border-radius: 28px;
   }
   
-  /* Card/Panel Styles - Border kuning gelap */
+  .btn-ghost {
+    @apply bg-transparent text-neutral-950 border-0 hover:bg-sky-100 
+           focus:ring-sky-200 px-4 py-2;
+    font-weight: 400; /* ghost button weight sesuai design.md */
+    border-radius: 9999px; /* pill untuk ghost button */
+  }
+  
+  /* Card - 28px radius, no shadow elevation (tonal contrast only per design.md) */
   .card {
-    @apply bg-white rounded-lg border border-yellow-dark shadow-md p-6;
+    @apply bg-white rounded-card p-8 border border-sky-200/50;
+    border-radius: 28px; /* card radius dari design.md */
+    box-shadow: none; /* no shadows per design.md */
   }
   
   .card-header {
-    @apply text-xl font-serif font-bold text-primary-900 mb-4 
-           pb-3 border-b border-yellow-dark;
+    @apply text-heading font-medium text-neutral-950 mb-6 
+           pb-4 border-b border-sky-200;
+    font-weight: 500; /* heading weight dari design.md */
+    letter-spacing: -0.02em; /* heading tracking dari design.md */
   }
   
-  /* Stats Card - Border kuning gelap */
+  /* Stats Card - tonal contrast tanpa shadow sesuai design.md */
   .stat-card {
-    @apply bg-gradient-to-br from-primary-100 to-primary-50 
-           rounded-lg border border-yellow-dark p-5 hover:shadow-lg 
-           transition-shadow duration-200;
+    @apply bg-gradient-to-br from-sky-50 to-white 
+           rounded-card p-6 border border-sky-200/50
+           hover:border-sky-300/70 transition-all duration-200;
+    border-radius: 28px;
+    box-shadow: none; /* flat design per design.md */
   }
   
   .stat-number {
-    @apply text-4xl font-serif font-bold text-primary-800;
+    @apply text-5xl font-medium text-sky-800;
+    font-weight: 500;
+    letter-spacing: -0.02em;
   }
   
   .stat-label {
-    @apply text-sm text-primary-700 mt-2;
+    @apply text-body-sm text-neutral-600 mt-2;
+    font-weight: 400;
   }
   
-  /* Form Styles - Border kuning gelap */
+  /* Form - minimal chrome sesuai design.md */
   .form-input {
-    @apply w-full px-4 py-2 rounded-md border border-yellow-dark 
-           focus:border-primary-700 focus:ring-2 focus:ring-primary-300 
-           bg-white text-primary-900 transition-colors duration-200;
+    @apply w-full px-4 py-3 rounded-input border border-sky-200 
+           focus:border-sky-500 focus:ring-2 focus:ring-sky-200 
+           bg-white text-neutral-950 transition-colors duration-200;
+    border-radius: 8px; /* input radius dari design.md */
+    font-weight: 400;
   }
   
   .form-label {
-    @apply block text-sm font-semibold text-primary-800 mb-2;
+    @apply block text-body-sm font-medium text-neutral-950 mb-2;
+    font-weight: 500; /* label weight dari design.md */
   }
   
   .form-group {
-    @apply mb-4;
+    @apply mb-5;
   }
   
-  /* Table Styles - Border kuning gelap */
+  /* Table - minimal dengan tonal separation */
   .table-container {
-    @apply overflow-x-auto rounded-lg border border-yellow-dark;
+    @apply overflow-x-auto rounded-card border border-sky-200/50;
+    border-radius: 28px;
   }
   
   .table {
-    @apply w-full text-sm text-left;
+    @apply w-full text-body-sm text-left;
   }
   
   .table thead {
-    @apply bg-gradient-to-r from-primary-900 to-primary-800 text-white;
+    @apply bg-gradient-to-r from-sky-600 to-sky-700 text-white;
   }
   
   .table th {
-    @apply px-4 py-3 font-semibold text-xs uppercase tracking-wider;
+    @apply px-6 py-4 font-medium text-eyebrow uppercase;
+    font-weight: 500;
+    letter-spacing: 0.1em; /* caps tracking dari design.md */
   }
   
   .table td {
-    @apply px-4 py-3 border-b border-primary-100;
+    @apply px-6 py-4 border-b border-sky-100;
+    font-weight: 400;
   }
   
   .table tbody tr {
-    @apply hover:bg-primary-50 transition-colors duration-150;
+    @apply hover:bg-sky-50/50 transition-colors duration-150;
   }
   
   .table tbody tr:nth-child(even) {
-    @apply bg-primary-50/30;
+    @apply bg-sky-50/30;
   }
   
-  /* Alert Styles */
+  /* Alert - minimal chrome */
   .alert {
-    @apply px-4 py-3 rounded-md mb-4 border-l-4;
+    @apply px-5 py-4 rounded-card mb-6 border-l-4;
+    border-radius: 18px; /* inner radius dari design.md */
+    font-weight: 400;
   }
   
   .alert-success {
-    @apply bg-green-50 border-green-500 text-green-800;
+    @apply bg-green-50 border-green-500 text-green-900;
   }
   
   .alert-error {
-    @apply bg-red-50 border-red-500 text-red-800;
+    @apply bg-red-50 border-red-500 text-red-900;
   }
   
   .alert-warning {
-    @apply bg-yellow-pale border-yellow text-primary-900;
+    @apply bg-amber-50 border-amber-500 text-amber-900;
   }
   
   .alert-info {
-    @apply bg-primary-100 border-primary-600 text-primary-900;
+    @apply bg-sky-50 border-sky-500 text-sky-900;
   }
   
-  /* Badge Styles */
+  /* Badge - pill shaped sesuai design.md */
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full 
-           text-xs font-semibold;
+    @apply inline-flex items-center px-3 py-1.5 rounded-pill 
+           text-caption font-medium border;
+    border-radius: 9999px; /* pill radius dari design.md */
+    font-weight: 500;
+    letter-spacing: 0.05em;
   }
   
   .badge-primary {
-    @apply bg-primary-200 text-primary-900 border border-primary-400;
+    @apply bg-sky-100 text-sky-900 border-sky-300;
   }
   
-  .badge-gold {
-    @apply bg-gold-pale text-primary-900 border border-gold;
+  .badge-amber {
+    @apply bg-amber-100 text-amber-900 border-amber-300;
   }
   
-  .badge-yellow {
-    @apply bg-yellow-pale text-primary-900 border border-yellow;
+  .badge-neutral {
+    @apply bg-neutral-100 text-neutral-900 border-neutral-300;
   }
   
-  /* Brand Header - Elegant */
+  /* Brand Header */
   .brand-header {
-    @apply text-2xl font-serif font-bold text-white tracking-tight;
+    @apply text-2xl font-medium text-white tracking-tight;
+    font-weight: 500;
+    letter-spacing: -0.01em;
   }
   
   .brand-subtitle {
-    @apply text-xs text-primary-300 mt-1 leading-relaxed;
+    @apply text-eyebrow text-white/70 mt-2 leading-relaxed uppercase;
+    font-weight: 400;
+    letter-spacing: 0.1em;
   }
   
   /* Page Header */
   .page-header {
-    @apply mb-6;
+    @apply mb-8;
   }
   
   .page-title {
-    @apply text-3xl font-serif font-bold text-primary-900;
+    @apply text-heading-lg font-medium text-neutral-950;
+    font-weight: 500;
+    letter-spacing: -0.03em; /* display tracking dari design.md */
   }
   
   .page-subtitle {
-    @apply text-sm text-primary-700 mt-1;
+    @apply text-body text-neutral-600 mt-2;
+    font-weight: 400;
+  }
+  
+  /* Category Eyebrow - sesuai design.md */
+  .eyebrow-label {
+    @apply text-eyebrow font-medium text-neutral-600 uppercase mb-2 block;
+    font-weight: 500;
+    letter-spacing: 0.1em; /* caps tracking dari design.md */
   }
 }
 
-/* Custom Utilities */
+/* Custom Utilities - sesuai design.md (minimal, flat) */
 @layer utilities {
-  .text-gradient-blue {
-    @apply bg-gradient-to-r from-primary-800 to-primary-600 
+  .text-gradient-sky {
+    @apply bg-gradient-to-r from-sky-600 to-sky-400 
            bg-clip-text text-transparent;
   }
   
-  .border-gold-gradient {
-    border-image: linear-gradient(to right, #FFD700, #E6C200) 1;
+  .bg-gradient-sky-white {
+    background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #ffffff 100%);
   }
   
-  .shadow-gold {
-    box-shadow: 0 4px 6px -1px rgba(255, 215, 0, 0.3), 
-                0 2px 4px -1px rgba(255, 215, 0, 0.2);
+  .bg-sky-accent {
+    @apply bg-sky-600;
   }
   
-  .shadow-blue {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 255, 0.2), 
-                0 2px 4px -1px rgba(0, 0, 255, 0.1);
+  /* Flat design - minimal shadow usage per design.md */
+  .shadow-subtle {
+    box-shadow: 0 1px 2px 0 rgba(14, 165, 233, 0.05);
+  }
+  
+  .shadow-card {
+    box-shadow: 0 1px 3px 0 rgba(14, 165, 233, 0.1);
   }
 }
 
-
-/* Status Badge Custom dengan skema warna biru-emas-kuning */
+/* Status Badge - sky blue + amber theme */
 @layer components {
   .badge.draft {
-    @apply bg-gray-100 text-gray-700 border border-gray-300;
+    @apply bg-neutral-100 text-neutral-700 border-neutral-300;
   }
   
   .badge.diajukan, .badge.diperiksa {
-    @apply bg-primary-100 text-primary-800 border border-primary-400;
+    @apply bg-sky-100 text-sky-800 border-sky-300;
   }
   
   .badge.revisi_diperlukan, .badge.kurang {
-    @apply bg-red-50 text-red-700 border border-red-300;
+    @apply bg-red-50 text-red-700 border-red-300;
   }
   
   .badge.disetujui_gkm, .badge.baik {
-    @apply bg-green-50 text-green-700 border border-green-400;
+    @apply bg-green-50 text-green-700 border-green-400;
   }
   
   .badge.ditandatangani, .badge.cukup {
-    @apply bg-yellow-pale text-primary-900 border border-yellow;
+    @apply bg-amber-100 text-amber-900 border-amber-400;
   }
   
   .badge.diarsipkan, .badge.sangatbaik {
-    @apply bg-gold-pale text-primary-900 border border-gold font-bold;
+    @apply bg-amber-200 text-amber-950 border-amber-500 font-medium;
   }
 }

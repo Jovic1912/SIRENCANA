@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 
 <div class="pagehead"><div><h1>Mahasiswa</h1><p>Data induk mahasiswa — dipakai sebagai peserta kelas.</p></div></div>

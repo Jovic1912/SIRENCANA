@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main') ?>
+<?= $this->extend('layout/main_tailwind') ?>
 <?= $this->section('content') ?>
 
 <div class="pagehead"><div><h1>Capaian CPMK — Laporan OBE</h1><p>Dihitung otomatis dari nilai mentah dan matriks bobot penilaian × CPMK pada RPS.</p></div></div>
