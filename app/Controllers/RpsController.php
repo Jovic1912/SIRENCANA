@@ -64,16 +64,19 @@ class RpsController extends BaseController
             'created_at'     => date('Y-m-d H:i:s'),
         ], true);
 
+        $sks = (int) ((new MataKuliahModel())->find($mkId)['sks'] ?? 3);
+        $alokasi = "KBT = {$sks}x50'; KPT = {$sks}x60'; KM = {$sks}x60'";
         $pertemuanModel = new RpsPertemuanModel();
         for ($i = 1; $i <= 16; $i++) {
             $pertemuanModel->insert([
                 'rps_id' => $rpsId, 'minggu' => $i, 'bentuk' => 'Luring', 'bobot' => 0,
                 'is_uts' => $i === 8 ? 1 : 0, 'is_uas' => $i === 16 ? 1 : 0,
+                'alokasi_waktu' => $alokasi,
             ]);
         }
         $jenisModel = new JenisPenilaianModel();
-        foreach ([['Tugas', 30], ['UTS', 30], ['UAS', 40]] as [$nama, $bobot]) {
-            $jenisModel->insert(['rps_id' => $rpsId, 'nama' => $nama, 'bobot' => $bobot]);
+        foreach ([['Tugas', 'tugas', 30], ['UTS', 'uts', 30], ['UAS', 'uas', 40]] as [$nama, $kategori, $bobot]) {
+            $jenisModel->insert(['rps_id' => $rpsId, 'nama' => $nama, 'kategori' => $kategori, 'bobot' => $bobot]);
         }
         $this->log($rpsId, 'draft', 'RPS dibuat sebagai draf.');
 
@@ -134,13 +137,21 @@ class RpsController extends BaseController
         $rows = $this->request->getPost('p');
         if (is_array($rows)) {
             foreach ($rows as $pid => $f) {
+                $luring  = trim((string) ($f['luring'] ?? ''));
+                $daring  = trim((string) ($f['daring'] ?? ''));
+                $blended = trim((string) ($f['blended'] ?? ''));
                 $model->where('rps_id', $id)->update((int) $pid, [
-                    'sub_cpmk'  => (string) ($f['sub_cpmk'] ?? ''),
-                    'indikator' => (string) ($f['indikator'] ?? ''),
-                    'materi'    => (string) ($f['materi'] ?? ''),
-                    'model'     => (string) ($f['model'] ?? ''),
-                    'bentuk'    => in_array($f['bentuk'] ?? '', ['Luring', 'Daring', 'Blended'], true) ? $f['bentuk'] : 'Luring',
-                    'bobot'     => max(0, min(100, (float) ($f['bobot'] ?? 0))),
+                    'sub_cpmk'      => (string) ($f['sub_cpmk'] ?? ''),
+                    'indikator'     => (string) ($f['indikator'] ?? ''),
+                    'materi'        => (string) ($f['materi'] ?? ''),
+                    'model'         => (string) ($f['model'] ?? ''),
+                    'luring'        => $luring,
+                    'daring'        => $daring,
+                    'blended'       => $blended,
+                    'bentuk'        => $blended !== '' ? 'Blended' : ($daring !== '' && $luring === '' ? 'Daring' : 'Luring'),
+                    'penilaian'     => (string) ($f['penilaian'] ?? ''),
+                    'alokasi_waktu' => (string) ($f['alokasi_waktu'] ?? ''),
+                    'bobot'         => max(0, min(100, (float) ($f['bobot'] ?? 0))),
                 ]);
             }
         }
@@ -173,10 +184,48 @@ class RpsController extends BaseController
             foreach ($rows as $jid => $f) {
                 $nama = trim((string) ($f['nama'] ?? ''));
                 if ($nama === '') continue;
-                $model->where('rps_id', $id)->update((int) $jid, ['nama' => $nama, 'bobot' => max(0, min(100, (float) ($f['bobot'] ?? 0)))]);
+                $kategori = array_key_exists($f['kategori'] ?? '', kategori_penilaian()) ? $f['kategori'] : 'tugas';
+                $model->where('rps_id', $id)->update((int) $jid, ['nama' => $nama, 'kategori' => $kategori, 'bobot' => max(0, min(100, (float) ($f['bobot'] ?? 0)))]);
             }
         }
         return redirect()->to(site_url('rps/' . $id) . '#penilaian')->with('success', 'Bobot penilaian disimpan.');
+    }
+
+    /** Identitas & kelengkapan RPS sesuai format RPS/Silabus OBE UMRAH. */
+    public function updateIdentitas(int $id)
+    {
+        [$rps, $deny] = $this->loadEditable($id);
+        if ($deny) return $deny;
+        $post = fn (string $k) => trim((string) $this->request->getPost($k));
+        $tgl = $post('tgl_penyusunan');
+        (new RpsModel())->update($id, [
+            'kode_dokumen'          => $post('kode_dokumen'),
+            'tgl_penyusunan'        => preg_match('/^\d{4}-\d{2}-\d{2}$/', $tgl) ? $tgl : null,
+            'bahan_kajian'          => $post('bahan_kajian'),
+            'pustaka'               => $post('pustaka'),
+            'media_software'        => $post('media_software'),
+            'media_hardware'        => $post('media_hardware'),
+            'mk_syarat'             => $post('mk_syarat'),
+            'sdgs'                  => $post('sdgs'),
+            'analisis_pembelajaran' => $post('analisis_pembelajaran'),
+        ]);
+        return redirect()->to(site_url('rps/' . $id) . '#identitas')->with('success', 'Identitas & kelengkapan RPS disimpan.');
+    }
+
+    /** Rencana Tugas / Quiz / Proyek / UTS / UAS untuk satu jenis penilaian. */
+    public function updateRencana(int $id, int $jenisId)
+    {
+        [$rps, $deny] = $this->loadEditable($id);
+        if ($deny) return $deny;
+        $model = new JenisPenilaianModel();
+        if (! $model->where('rps_id', $id)->find($jenisId)) {
+            return redirect()->to(site_url('rps/' . $id) . '#penilaian')->with('error', 'Jenis penilaian tidak ditemukan.');
+        }
+        $fields = ['judul', 'sub_cpmk', 'deskripsi', 'metode', 'luaran_objek', 'luaran_bentuk', 'indikator', 'kriteria', 'jadwal', 'lain_lain', 'rujukan', 'rubrik'];
+        $payload = [];
+        foreach ($fields as $f) { $payload[$f] = trim((string) $this->request->getPost($f)); }
+        $model->update($jenisId, $payload);
+        return redirect()->to(site_url('rps/' . $id) . '#rencana-' . $jenisId)->with('success', 'Rencana asesmen disimpan.');
     }
 
     public function updateMatriks(int $id)
@@ -239,9 +288,14 @@ class RpsController extends BaseController
         if (! Access::canEditRps($rps)) {
             return redirect()->to(site_url('rps'))->with('error', 'Hanya pengembang RPS yang dapat mengajukan.');
         }
-        $total = array_sum(array_column((new JenisPenilaianModel())->where('rps_id', $id)->findAll(), 'bobot'));
+        $jenis = (new JenisPenilaianModel())->where('rps_id', $id)->findAll();
+        $total = array_sum(array_column($jenis, 'bobot'));
         if (abs($total - 100) > 0.01) {
             return redirect()->to(site_url('rps/' . $id) . '#penilaian')->with('error', 'Total bobot jenis penilaian harus 100% sebelum diajukan (saat ini ' . $total . '%).');
+        }
+        $kategori = array_column($jenis, 'kategori');
+        if (! in_array('uts', $kategori, true) || ! in_array('uas', $kategori, true)) {
+            return redirect()->to(site_url('rps/' . $id) . '#penilaian')->with('error', 'Format RPS UMRAH mewajibkan jenis penilaian UTS dan UAS.');
         }
         $this->setStatus($id, 'diajukan', $this->request->getPost('catatan'));
         return redirect()->to(site_url('rps/' . $id))->with('success', 'RPS diajukan ke GKM.');

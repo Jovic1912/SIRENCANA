@@ -10,5 +10,5 @@ class JenisPenilaianModel extends Model
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
     protected $useTimestamps = false;
-    protected $allowedFields = ['rps_id', 'nama', 'bobot'];
+    protected $allowedFields = ['rps_id', 'nama', 'bobot', 'kategori', 'judul', 'sub_cpmk', 'deskripsi', 'metode', 'luaran_objek', 'luaran_bentuk', 'indikator', 'kriteria', 'jadwal', 'lain_lain', 'rujukan', 'rubrik'];
 }

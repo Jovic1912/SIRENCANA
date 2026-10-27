@@ -47,7 +47,7 @@
                 <option value="H" <?= $st==='H'?'selected':'' ?>>Hadir</option>
                 <option value="I" <?= $st==='I'?'selected':'' ?>>Izin</option>
                 <option value="S" <?= $st==='S'?'selected':'' ?>>Sakit</option>
-                <option value="A" <?= $st==='A'?'selected':'' ?>>Alpa</option>
+                <option value="A" <?= $st==='A'?'selected':'' ?>>Tanpa Keterangan (TK)</option>
               </select>
             </td>
           </tr>

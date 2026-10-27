@@ -58,12 +58,54 @@ if (! function_exists('nilai_huruf')) {
     }
 }
 
+if (! function_exists('nilai_mutu')) {
+    /** Nilai dalam angka (bobot mutu) sesuai Peraturan Rektor UMRAH No. 03 Tahun 2025. */
+    function nilai_mutu(string $huruf): string
+    {
+        $map = ['A' => '4,00', 'A-' => '3,75', 'B+' => '3,5', 'B' => '3,0', 'B-' => '2,75', 'C+' => '2,5', 'C' => '2', 'D' => '1', 'E' => '0'];
+        return $map[$huruf] ?? '-';
+    }
+}
+
+if (! function_exists('kategori_penilaian')) {
+    /** Kategori jenis penilaian → label rencana asesmen pada format RPS UMRAH. */
+    function kategori_penilaian(?string $k = null)
+    {
+        $map = ['tugas' => 'Tugas', 'quiz' => 'Quiz', 'proyek' => 'Proyek / Case', 'uts' => 'UTS', 'uas' => 'UAS', 'lainnya' => 'Lainnya'];
+        return $k === null ? $map : ($map[$k] ?? ucfirst($k));
+    }
+}
+
+if (! function_exists('kelengkapan_portofolio')) {
+    /** Butir Daftar Kelengkapan Portofolio Mata Kuliah (format UMRAH). */
+    function kelengkapan_portofolio(): array
+    {
+        return [
+            'portofolio'     => 'Portofolio MK',
+            'analisis'       => 'Analisis Pembelajaran',
+            'rps'            => 'Rencana Pembelajaran Semester (RPS)',
+            'basis_evaluasi' => 'Basis Evaluasi Penilaian',
+            'lembar_tugas'   => 'Lembar Tugas Mahasiswa',
+            'kontrak'        => 'Kontrak Perkuliahan',
+            'jurnal_sipa'    => 'Jurnal Perkuliahan (SIPA)',
+            'rekap_presensi' => 'Rekapitulasi Presensi',
+            'soal_uts'       => 'Soal Asesmen: UTS',
+            'soal_uas'       => 'Soal Asesmen: UAS',
+            'soal_proyek'    => 'Soal Asesmen: Proyek/Case Method',
+            'rekap_nilai'    => 'Rekapitulasi Nilai Akhir',
+            'rekap_cpmk'     => 'Rekapitulasi Hasil Pencapaian Tiap CPMK',
+            'laporan_obe'    => 'OBE: Laporan Pencapaian Keseluruhan Capaian Pembelajaran Mata Kuliah (CPMK)',
+        ];
+    }
+}
+
 if (! function_exists('skala_rubrik')) {
     function skala_rubrik(float $n): string
     {
-        if ($n >= 80) return 'Sangat Baik';
+        // Mengikuti format Portofolio OBE UMRAH 2026
+        if ($n >= 75) return 'Sangat Baik';
         if ($n >= 65) return 'Baik';
-        if ($n >= 50) return 'Cukup';
+        if ($n >= 55) return 'Cukup';
         return 'Kurang';
     }
 }
@@ -91,8 +133,10 @@ if (! function_exists('rekap_presensi')) {
                 case 'A': $a++; break;
             }
         }
-        $skor = $jumlahPertemuan > 0 ? round(($h / $jumlahPertemuan) * 1000) / 10 : 0;
-        return ['h' => $h, 'i' => $i, 's' => $s, 'a' => $a, 'skor' => $skor, 'eligible' => $skor >= 75];
+        // Format UMRAH: skor kehadiran = (hadir + izin + sakit) / jumlah pertemuan;
+        // tidak boleh ikut UAS bila tanpa keterangan lebih dari 3 pertemuan (Kontrak Kuliah poin 13).
+        $skor = $jumlahPertemuan > 0 ? round((($h + $i + $s) / $jumlahPertemuan) * 10000) / 100 : 0;
+        return ['h' => $h, 'i' => $i, 's' => $s, 'a' => $a, 'skor' => $skor, 'eligible' => $a <= 3];
     }
 }
 
@@ -137,7 +181,7 @@ if (! function_exists('capaian_cpmk')) {
                 'cpmk'     => $cp,
                 'nilai'    => $nilai,
                 'skala'    => $nilai !== null ? skala_rubrik($nilai) : null,
-                'lulus'    => $nilai !== null ? $nilai >= 65 : null,
+                'lulus'    => $nilai !== null ? $nilai >= 55 : null,
                 'ada_data' => $bobotTotal > 0,
             ];
         }

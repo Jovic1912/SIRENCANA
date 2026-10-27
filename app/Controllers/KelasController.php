@@ -135,6 +135,7 @@ class KelasController extends BaseController
             'jadwal_hari'  => $this->request->getPost('jadwal_hari'),
             'jadwal_jam'   => $this->request->getPost('jadwal_jam'),
             'klausa'       => $this->request->getPost('klausa'),
+            'koordinator_kelas' => trim((string) $this->request->getPost('koordinator_kelas')),
             'ttd'          => $this->request->getPost('ttd') ? 1 : 0,
         ];
         if ($payload['ttd'] && empty($kontrak['ttd'])) {

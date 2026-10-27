@@ -48,12 +48,23 @@ class CapaianController extends BaseController
             $nilaiByJenis = [];
             foreach ($nilaiRows as $n) { $nilaiByJenis[$n['jenis_penilaian_id']] = $n['nilai']; }
 
+            $pres = rekap_presensi($presensiRows, (int) ($kelas['jumlah_pertemuan'] ?? 16));
+            $capaian = capaian_cpmk($nilaiByJenis, $cpmkList, $matriksRows);
+            // Mahasiswa yang tidak boleh ikut UAS dinyatakan tidak lulus seluruh CPMK (format UMRAH).
+            foreach ($capaian as &$c) {
+                $c['tidak_eligible'] = ! $pres['eligible'];
+                if (! $pres['eligible'] && $c['nilai'] !== null) $c['lulus'] = false;
+            }
+            unset($c);
+
             $rows[] = [
-                'peserta' => $p,
-                'mhs'     => $mhsById[$p['mahasiswa_id']] ?? null,
-                'pres'    => rekap_presensi($presensiRows, (int) ($kelas['jumlah_pertemuan'] ?? 16)),
-                'akhir'   => nilai_akhir($nilaiByJenis, $jenisList),
-                'capaian' => capaian_cpmk($nilaiByJenis, $cpmkList, $matriksRows),
+                'peserta'       => $p,
+                'mhs'           => $mhsById[$p['mahasiswa_id']] ?? null,
+                'pres'          => $pres,
+                'presensiRows'  => array_column($presensiRows, 'status', 'pertemuan'),
+                'nilaiByJenis'  => $nilaiByJenis,
+                'akhir'         => nilai_akhir($nilaiByJenis, $jenisList),
+                'capaian'       => $capaian,
             ];
         }
 
@@ -65,20 +76,22 @@ class CapaianController extends BaseController
                     if ($c['cpmk']['id'] === $cp['id'] && $c['nilai'] !== null) $vals[] = $c;
                 }
             }
-            $count = fn ($skala) => count(array_filter($vals, fn ($v) => $v['skala'] === $skala));
-            $lulus = count(array_filter($vals, fn ($v) => $v['lulus']));
+            $eligibleVals = array_filter($vals, fn ($v) => ! $v['tidak_eligible']);
+            $count = fn ($skala) => count(array_filter($eligibleVals, fn ($v) => $v['skala'] === $skala));
+            $tercapai = $count('Sangat Baik') + $count('Baik') + $count('Cukup');
             $summary[] = [
-                'cpmk'       => $cp,
-                'total'      => count($vals),
-                'sb'         => $count('Sangat Baik'),
-                'b'          => $count('Baik'),
-                'c'          => $count('Cukup'),
-                'k'          => $count('Kurang'),
-                'persenLulus'=> count($vals) ? round($lulus / count($vals) * 1000) / 10 : 0,
+                'cpmk'        => $cp,
+                'total'       => count($vals),
+                'sb'          => $count('Sangat Baik'),
+                'b'           => $count('Baik'),
+                'c'           => $count('Cukup'),
+                'k'           => $count('Kurang'),
+                'tidakLulus'  => count($vals) - count($eligibleVals),
+                'persenLulus' => count($vals) ? round($tercapai / count($vals) * 1000) / 10 : 0,
             ];
         }
 
-        return ['mk' => $mk, 'cpmkList' => $cpmkList, 'rows' => $rows, 'summary' => $summary];
+        return ['mk' => $mk, 'cpmkList' => $cpmkList, 'jenisList' => $jenisList, 'matriksRows' => $matriksRows, 'rows' => $rows, 'summary' => $summary];
     }
 
     public function show(int $id)

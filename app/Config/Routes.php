@@ -60,6 +60,8 @@ $routes->group('', ['filter' => 'auth'], static function (RouteCollection $route
     $routes->post('rps/(:num)/jenis/delete/(:num)', 'RpsController::deleteJenis/$1/$2', ['filter' => 'role:dosen,admin']);
     $routes->post('rps/(:num)/jenis/update', 'RpsController::updateJenis/$1', ['filter' => 'role:dosen,admin']);
     $routes->post('rps/(:num)/matriks', 'RpsController::updateMatriks/$1', ['filter' => 'role:dosen,admin']);
+    $routes->post('rps/(:num)/identitas', 'RpsController::updateIdentitas/$1', ['filter' => 'role:dosen,admin']);
+    $routes->post('rps/(:num)/jenis/(:num)/rencana', 'RpsController::updateRencana/$1/$2', ['filter' => 'role:dosen,admin']);
     $routes->post('rps/(:num)/workflow/ajukan', 'RpsController::wfAjukan/$1', ['filter' => 'role:dosen,admin']);
     $routes->post('rps/(:num)/workflow/revisi', 'RpsController::wfRevisi/$1', ['filter' => 'role:gkm']);
     $routes->post('rps/(:num)/workflow/setuju', 'RpsController::wfSetuju/$1', ['filter' => 'role:gkm']);
@@ -88,4 +90,20 @@ $routes->group('', ['filter' => 'auth'], static function (RouteCollection $route
     $routes->get('portofolio', 'PortofolioController::index');
     $routes->get('portofolio/(:num)', 'PortofolioController::show/$1');
     $routes->post('portofolio/(:num)/narasi', 'PortofolioController::updateNarasi/$1', ['filter' => 'role:admin,kaprodi,dosen']);
+
+    // Laporan sesuai format dokumen OBE UMRAH 2026 (halaman siap cetak / simpan PDF)
+    $routes->get('laporan', 'LaporanController::index');
+    $routes->get('laporan/silabus/(:num)', 'LaporanController::silabus/$1');
+    $routes->get('laporan/rps/(:num)', 'LaporanController::rps/$1');
+    $routes->get('laporan/kontrak/(:num)', 'LaporanController::kontrak/$1');
+    $routes->get('laporan/portofolio/(:num)', 'LaporanController::portofolio/$1');
+    $routes->get('laporan/epbm/(:num)', 'LaporanController::epbm/$1', ['filter' => 'role:admin,kaprodi,gkm,gpm']);
+
+    $routes->group('epbm', ['filter' => 'role:admin,kaprodi,gkm,gpm'], static function (RouteCollection $routes) {
+        $routes->get('/', 'EpbmController::index');
+        $routes->get('(:num)', 'EpbmController::edit/$1');
+        $routes->post('store', 'EpbmController::store', ['filter' => 'role:admin,gkm']);
+        $routes->post('(:num)/update', 'EpbmController::update/$1', ['filter' => 'role:admin,gkm']);
+        $routes->post('(:num)/delete', 'EpbmController::delete/$1', ['filter' => 'role:admin,gkm']);
+    });
 });

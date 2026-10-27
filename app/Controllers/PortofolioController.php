@@ -10,11 +10,29 @@ use App\Models\PortofolioModel;
 use App\Models\KontrakKuliahModel;
 use App\Models\PesertaKelasModel;
 use App\Models\PresensiModel;
-use App\Models\NilaiModel;
-use App\Models\JenisPenilaianModel;
 
 class PortofolioController extends BaseController
 {
+    /** Kolom narasi portofolio, urut sesuai format Portofolio MK UMRAH. */
+    public const NARASI = [
+        'pendahuluan'     => ['1. Pendahuluan', 'Ceritakan penjelasan yang diperlukan tentang mata kuliah ini'],
+        'tujuan'          => ['2. Tujuan', 'Jelaskan tujuan perkuliahan umum maupun khusus'],
+        'metode'          => ['3. Metode Pembelajaran', 'Jelaskan strategi yang digunakan untuk mencapai tujuan perkuliahan (CPMK)'],
+        'isi'             => ['4. Isi Perkuliahan', 'Jelaskan kesesuaiannya dengan kurikulum yang berlaku'],
+        'peserta_ket'     => ['5. Peserta Kuliah', 'Berikan gambaran tentang peserta kuliah'],
+        'kehadiran_ket'   => ['6. Persentase Kehadiran', 'Uraian % kehadiran dosen dan % kehadiran mahasiswa (angka dihitung otomatis)'],
+        'sistem_evaluasi' => ['7. Sistem Evaluasi', 'Jelaskan tentang PR, kuis, tugas kelompok, praktikum, dll.'],
+        'hasil_capaian'   => ['8. Hasil Capaian Pembelajaran', 'Jelaskan capaian atas tujuan yang telah ditetapkan (tabel capaian CPMK dihitung otomatis)'],
+        'rekomendasi'     => ['11. Rekomendasi Perbaikan', 'Rekomendasi perbaikan untuk pelaksanaan berikutnya'],
+    ];
+
+    public const TAUTAN = [
+        'tautan_rps'      => 'Tautan RPS',
+        'tautan_kontrak'  => 'Tautan Kontrak Kuliah',
+        'tautan_presensi' => 'Tautan Presensi SIPA',
+        'tautan_soal'     => 'Tautan Soal Ujian',
+    ];
+
     public function index()
     {
         $data = [
@@ -23,6 +41,56 @@ class PortofolioController extends BaseController
             'mkById'   => array_column((new MataKuliahModel())->findAll(), null, 'id'),
         ];
         return view('portofolio/pilih', $data);
+    }
+
+    /**
+     * Jumlah pertemuan yang benar-benar terlaksana (punya data presensi),
+     * dipakai sebagai default realisasi tatap muka dosen.
+     */
+    public static function pertemuanTerlaksana(int $kelasId): int
+    {
+        $pesertaIds = array_column((new PesertaKelasModel())->where('kelas_id', $kelasId)->findAll(), 'id');
+        if (! $pesertaIds) return 0;
+        $rows = (new PresensiModel())->select('pertemuan')->whereIn('peserta_id', $pesertaIds)->groupBy('pertemuan')->findAll();
+        return count($rows);
+    }
+
+    /**
+     * Status kelengkapan portofolio: nilai tersimpan bila dosen sudah mengisi,
+     * selain itu ditebak dari data di sistem.
+     */
+    public static function kelengkapan(array $kelas, ?array $rps, ?array $portofolio, ?array $kontrak, array $hasil): array
+    {
+        $saved = json_decode((string) ($portofolio['kelengkapan'] ?? ''), true);
+        if (is_array($saved) && $saved) {
+            $out = [];
+            foreach (kelengkapan_portofolio() as $k => $_) { $out[$k] = ! empty($saved[$k]); }
+            return $out;
+        }
+
+        $rows = $hasil['rows'];
+        $kategori = array_column($hasil['jenisList'], 'kategori');
+        $isi = fn (?string $v) => trim((string) $v) !== '';
+        $adaNilai = $rows && count(array_filter($rows, fn ($r) => $r['akhir']['lengkap'])) === count($rows);
+        $adaPresensi = $rows && count(array_filter($rows, fn ($r) => $r['presensiRows'])) > 0;
+        $rencanaTugas = array_filter($hasil['jenisList'], fn ($j) => $isi($j['deskripsi'] ?? '') || $isi($j['judul'] ?? ''));
+
+        return [
+            'portofolio'     => $isi($portofolio['tujuan'] ?? '') && $isi($portofolio['metode'] ?? ''),
+            'analisis'       => $isi($rps['analisis_pembelajaran'] ?? ''),
+            'rps'            => ($rps['status'] ?? '') === 'diarsipkan',
+            'basis_evaluasi' => ! empty($hasil['matriksRows']),
+            'lembar_tugas'   => (bool) $rencanaTugas,
+            'kontrak'        => ! empty($kontrak['ttd']),
+            'jurnal_sipa'    => $isi($portofolio['tautan_presensi'] ?? ''),
+            'rekap_presensi' => $adaPresensi,
+            'soal_uts'       => in_array('uts', $kategori, true) && $isi($portofolio['tautan_soal'] ?? ''),
+            'soal_uas'       => in_array('uas', $kategori, true) && $isi($portofolio['tautan_soal'] ?? ''),
+            'soal_proyek'    => in_array('proyek', $kategori, true),
+            'rekap_nilai'    => $adaNilai,
+            'rekap_cpmk'     => $adaNilai && ! empty($hasil['cpmkList']),
+            'laporan_obe'    => $adaNilai && ! empty($hasil['cpmkList']),
+        ];
     }
 
     public function show(int $id)
@@ -35,23 +103,6 @@ class PortofolioController extends BaseController
         $rps = (new RpsModel())->find($kelas['rps_id']);
         $portofolio = (new PortofolioModel())->where('kelas_id', $id)->first();
         $kontrak = (new KontrakKuliahModel())->where('kelas_id', $id)->first();
-
-        $peserta = (new PesertaKelasModel())->where('kelas_id', $id)->findAll();
-        $jenisList = (new JenisPenilaianModel())->where('rps_id', $kelas['rps_id'])->findAll();
-        $presensiModel = new PresensiModel();
-        $nilaiModel = new NilaiModel();
-
-        $presLengkap = count($peserta) > 0;
-        $nilaiLengkap = count($peserta) > 0;
-        foreach ($peserta as $p) {
-            $jumlahPresensi = $presensiModel->where('peserta_id', $p['id'])->countAllResults();
-            if ($jumlahPresensi < (int) ($kelas['jumlah_pertemuan'] ?? 16)) $presLengkap = false;
-
-            $nilaiRows = $nilaiModel->where('peserta_id', $p['id'])->findAll();
-            $byJenis = array_column($nilaiRows, 'nilai', 'jenis_penilaian_id');
-            if (! nilai_akhir($byJenis, $jenisList)['lengkap']) $nilaiLengkap = false;
-        }
-
         $hasil = CapaianController::hitung($kelas);
 
         $data = [
@@ -61,9 +112,9 @@ class PortofolioController extends BaseController
             'rps'          => $rps,
             'portofolio'   => $portofolio,
             'kontrak'      => $kontrak,
-            'peserta'      => $peserta,
-            'presLengkap'  => $presLengkap,
-            'nilaiLengkap' => $nilaiLengkap,
+            'jumlahPeserta'=> count($hasil['rows']),
+            'terlaksana'   => self::pertemuanTerlaksana($id),
+            'kelengkapan'  => self::kelengkapan($kelas, $rps, $portofolio, $kontrak, $hasil),
             'rows'         => $hasil['rows'],
             'cpmkList'     => $hasil['cpmkList'],
             'summary'      => $hasil['summary'],
@@ -74,20 +125,28 @@ class PortofolioController extends BaseController
 
     public function updateNarasi(int $id)
     {
-        if (! Access::canWriteKelasData($id)) return redirect()->to(site_url('portofolio'))->with('error', 'Hanya dosen pengampu yang dapat mengubah narasi portofolio.');
+        if (! Access::canWriteKelasData($id)) return redirect()->to(site_url('portofolio'))->with('error', 'Hanya dosen pengampu yang dapat mengubah portofolio.');
         $model = new PortofolioModel();
         $existing = $model->where('kelas_id', $id)->first();
-        $payload = [
-            'tujuan' => $this->request->getPost('tujuan'),
-            'metode' => $this->request->getPost('metode'),
-            'isi'    => $this->request->getPost('isi'),
-        ];
+
+        $payload = [];
+        foreach (array_keys(self::NARASI + self::TAUTAN) as $f) {
+            $payload[$f] = trim((string) $this->request->getPost($f));
+        }
+        $realisasi = $this->request->getPost('realisasi_tatap_muka');
+        $payload['realisasi_tatap_muka'] = is_numeric($realisasi) ? max(0, min(99, (int) $realisasi)) : null;
+
+        $centang = (array) ($this->request->getPost('kelengkapan') ?? []);
+        $kelengkapan = [];
+        foreach (kelengkapan_portofolio() as $k => $_) { $kelengkapan[$k] = isset($centang[$k]) ? 1 : 0; }
+        $payload['kelengkapan'] = json_encode($kelengkapan);
+
         if ($existing) {
             $model->update($existing['id'], $payload);
         } else {
             $payload['kelas_id'] = $id;
             $model->insert($payload);
         }
-        return redirect()->to(site_url('portofolio/' . $id))->with('success', 'Narasi portofolio disimpan.');
+        return redirect()->to(site_url('portofolio/' . $id))->with('success', 'Portofolio disimpan.');
     }
 }

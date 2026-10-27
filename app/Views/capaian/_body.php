@@ -6,12 +6,12 @@
   <div class="panel">
     <h2>Ringkasan per CPMK</h2>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>CPMK</th><th class="num">Sangat Baik</th><th class="num">Baik</th><th class="num">Cukup</th><th class="num">Kurang</th><th class="num">% Kelulusan</th></tr></thead>
+      <thead><tr><th>CPMK</th><th class="num">Sangat Baik</th><th class="num">Baik</th><th class="num">Cukup</th><th class="num">Kurang</th><th class="num">Tidak Lulus</th><th class="num">% Kelulusan</th></tr></thead>
       <tbody>
       <?php foreach ($summary as $s): ?>
         <tr>
           <td class="mono"><?= esc($s['cpmk']['kode']) ?></td>
-          <td class="num"><?= $s['sb'] ?></td><td class="num"><?= $s['b'] ?></td><td class="num"><?= $s['c'] ?></td><td class="num"><?= $s['k'] ?></td>
+          <td class="num"><?= $s['sb'] ?></td><td class="num"><?= $s['b'] ?></td><td class="num"><?= $s['c'] ?></td><td class="num"><?= $s['k'] ?></td><td class="num"><?= $s['tidakLulus'] ?></td>
           <td class="num"><strong><?= $s['persenLulus'] ?>%</strong></td>
         </tr>
       <?php endforeach; ?>
@@ -27,7 +27,7 @@
         <tr>
           <td class="mono"><?= esc($r['mhs']['nim'] ?? '—') ?></td>
           <td><?= esc($r['mhs']['nama'] ?? '—') ?></td>
-          <td class="num"><?= $r['pres']['skor'] ?>% <?= $r['pres']['eligible'] ? '' : '<span class="badge revisi_diperlukan">Tak Eligible</span>' ?></td>
+          <td class="num"><?= $r['pres']['skor'] ?>% <?= $r['pres']['eligible'] ? '' : '<span class="badge revisi_diperlukan">Tidak bisa UAS</span>' ?></td>
           <?php foreach ($r['capaian'] as $c): ?>
             <td class="num"><?= $c['nilai'] !== null ? esc($c['nilai']) . ' <span class="badge ' . skala_class($c['skala']) . '">' . esc($c['skala']) . '</span>' : '<span class="muted">—</span>' ?></td>
           <?php endforeach; ?>

@@ -20,6 +20,10 @@
       · Pengampu: <?= esc(implode(', ', $dosenNama) ?: '—') ?>
     </p>
   </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <a class="btn ghost sm" target="_blank" href="<?= site_url('laporan/kontrak/' . $kelas['id']) ?>">Cetak Kontrak Kuliah</a>
+    <a class="btn ghost sm" target="_blank" href="<?= site_url('laporan/portofolio/' . $kelas['id']) ?>">Cetak Portofolio</a>
+  </div>
 </div>
 
 <div class="two-col">
@@ -50,8 +54,18 @@
             </div>
           </div>
           <div class="field">
+            <label>Koordinator Kelas (perwakilan mahasiswa yang menandatangani)</label>
+            <input type="text" name="koordinator_kelas" list="daftar-peserta" placeholder="Ketik atau pilih nama peserta" value="<?= esc($kontrak['koordinator_kelas'] ?? '') ?>">
+            <datalist id="daftar-peserta">
+              <?php foreach ($peserta as $p): $m = $mhsById[$p['mahasiswa_id']] ?? null; if (! $m) continue; ?>
+                <option value="<?= esc($m['nama']) ?>"><?= esc($m['nim']) ?></option>
+              <?php endforeach; ?>
+            </datalist>
+          </div>
+          <div class="field">
             <label>Klausa &amp; Tata Tertib Tambahan</label>
             <textarea name="klausa" rows="8" placeholder="Tuliskan kesepakatan tambahan, satu poin per baris."><?= esc($kontrak['klausa'] ?? '') ?></textarea>
+            <p class="hint">16 poin tata tertib standar, hak &amp; kewajiban dosen, tabel nilai, dan bobot penilaian dari RPS otomatis dicantumkan pada dokumen kontrak. Isi di sini hanya kesepakatan tambahan.</p>
           </div>
           <div class="ttd-box">
             <label class="check-line">
@@ -71,6 +85,7 @@
           <dt>Ruang</dt><dd><?= $isiAtau($kontrak['jadwal_ruang'] ?? '') ?></dd>
           <dt>Hari</dt><dd><?= $isiAtau($kontrak['jadwal_hari'] ?? '') ?></dd>
           <dt>Jam</dt><dd><?= $isiAtau($kontrak['jadwal_jam'] ?? '') ?></dd>
+          <dt>Koordinator Kelas</dt><dd><?= $isiAtau($kontrak['koordinator_kelas'] ?? '') ?></dd>
           <dt>Klausa</dt>
           <dd class="prewrap"><?= $isiAtau($kontrak['klausa'] ?? '') ?></dd>
           <?php if ($sudahTtd && ! empty($kontrak['tgl_ttd'])): ?>

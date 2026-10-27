@@ -10,5 +10,5 @@ class KontrakKuliahModel extends Model
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
     protected $useTimestamps = false;
-    protected $allowedFields = ['kelas_id', 'jadwal_ruang', 'jadwal_hari', 'jadwal_jam', 'klausa', 'ttd', 'tgl_ttd'];
+    protected $allowedFields = ['kelas_id', 'jadwal_ruang', 'jadwal_hari', 'jadwal_jam', 'klausa', 'ttd', 'tgl_ttd', 'koordinator_kelas'];
 }

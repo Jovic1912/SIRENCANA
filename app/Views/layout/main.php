@@ -41,6 +41,12 @@
       <a href="<?= site_url('capaian') ?>" class="<?= $on('capaian') ?>">Capaian CPMK</a>
       <a href="<?= site_url('portofolio') ?>" class="<?= $on('portofolio') ?>">Portofolio MK</a>
 
+      <div class="group-label">Laporan</div>
+      <a href="<?= site_url('laporan') ?>" class="<?= $on('laporan') ?>">Dokumen &amp; Cetak</a>
+      <?php if (has_role('admin', 'kaprodi', 'gkm', 'gpm')): ?>
+        <a href="<?= site_url('epbm') ?>" class="<?= $on('epbm') ?>">Laporan EPBM</a>
+      <?php endif; ?>
+
       <?php if (has_role('admin')): ?>
         <div class="group-label">Administrasi</div>
         <a href="<?= site_url('users') ?>" class="<?= $on('users') ?>">Pengguna</a>

@@ -10,5 +10,5 @@ class RpsPertemuanModel extends Model
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
     protected $useTimestamps = false;
-    protected $allowedFields = ['rps_id', 'minggu', 'sub_cpmk', 'indikator', 'materi', 'model', 'bentuk', 'bobot', 'is_uts', 'is_uas'];
+    protected $allowedFields = ['rps_id', 'minggu', 'sub_cpmk', 'indikator', 'materi', 'model', 'bentuk', 'bobot', 'is_uts', 'is_uas', 'luring', 'daring', 'blended', 'penilaian', 'alokasi_waktu'];
 }
